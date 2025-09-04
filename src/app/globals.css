@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* 사주나우 브랜드 컬러 팔레트 */
+    --background: 0 0% 100%;
+    --foreground: 28 15% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 28 15% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 28 15% 15%;
+    
+    /* Primary: 깊고 따뜻한 브라운 (전통적 느낌) */
+    --primary: 28 30% 25%;
+    --primary-foreground: 45 50% 95%;
+    
+    /* Secondary: 부드러운 베이지 (현대적 감성) */
+    --secondary: 45 25% 92%;
+    --secondary-foreground: 28 30% 25%;
+    
+    /* Accent: 금색 계열 (고급스러운 포인트) */
+    --accent: 45 60% 75%;
+    --accent-foreground: 28 30% 25%;
+    
+    /* 그레이스케일: 따뜻한 톤 */
+    --muted: 45 15% 95%;
+    --muted-foreground: 28 10% 50%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 45 15% 88%;
+    --input: 45 15% 88%;
+    --ring: 28 30% 25%;
+    --radius: 0.75rem;
+    
+    /* 사주 차트 전용 컬러 (오행 기반) */
+    --chart-1: 28 60% 55%; /* 토(土) - 황토색 */
+    --chart-2: 200 50% 40%; /* 수(水) - 청색 */
+    --chart-3: 120 40% 35%; /* 목(木) - 녹색 */
+    --chart-4: 0 70% 50%; /* 화(火) - 적색 */
+    --chart-5: 50 30% 85%; /* 금(金) - 백금색 */
+  }
+
+  .dark {
+    /* 다크모드: 깊은 브라운 베이스 */
+    --background: 28 20% 8%;
+    --foreground: 45 40% 90%;
+    --card: 28 15% 12%;
+    --card-foreground: 45 40% 90%;
+    --popover: 28 15% 12%;
+    --popover-foreground: 45 40% 90%;
+    
+    /* Primary: 밝은 골드 톤 */
+    --primary: 45 50% 70%;
+    --primary-foreground: 28 20% 8%;
+    
+    /* Secondary: 다크 브라운 */
+    --secondary: 28 15% 18%;
+    --secondary-foreground: 45 40% 90%;
+    
+    /* Accent: 따뜻한 골드 */
+    --accent: 45 45% 60%;
+    --accent-foreground: 28 20% 8%;
+    
+    /* 그레이스케일: 따뜻한 다크 톤 */
+    --muted: 28 10% 15%;
+    --muted-foreground: 45 20% 65%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 28 10% 20%;
+    --input: 28 10% 20%;
+    --ring: 45 50% 70%;
+    
+    /* 다크모드 차트 컬러 (오행 기반) */
+    --chart-1: 28 50% 65%; /* 토(土) - 밝은 황토색 */
+    --chart-2: 200 60% 60%; /* 수(水) - 밝은 청색 */
+    --chart-3: 120 50% 55%; /* 목(木) - 밝은 녹색 */
+    --chart-4: 0 70% 65%; /* 화(火) - 밝은 적색 */
+    --chart-5: 50 40% 75%; /* 금(金) - 밝은 백금색 */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  
+  /* 타이포그래피 스타일 정의 */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+  
+  /* 사주 해석 텍스트용 스타일 */
+  .saju-interpretation {
+    @apply font-serif text-foreground/90 leading-relaxed;
+  }
+  
+  /* 숫자 및 데이터 표시용 */
+  .saju-data {
+    @apply font-mono tabular-nums;
+  }
+}
