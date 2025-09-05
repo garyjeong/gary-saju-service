@@ -4,80 +4,122 @@
 
 @layer base {
   :root {
-    /* 개-사주 브랜드 컬러 팔레트 */
+    /* 개-사주 DeepSeek 스타일 브랜드 팔레트 */
     --background: 0 0% 100%;
-    --foreground: 28 15% 15%;
+    --background-secondary: 240 10% 99%;
+    --background-tertiary: 240 5% 97%;
+    --foreground: 220 13% 9%;
+    --foreground-secondary: 220 9% 46%;
+    --foreground-muted: 220 9% 64%;
+    
+    /* Card & Surface with Glass Effect */
     --card: 0 0% 100%;
-    --card-foreground: 28 15% 15%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 28 15% 15%;
+    --card-foreground: 220 13% 9%;
+    --card-border: 220 13% 92%;
+    --glass: 0 0% 100%;
+    --glass-border: 220 13% 91%;
     
-    /* Primary: 깊고 따뜻한 브라운 (전통적 느낌) */
-    --primary: 28 30% 25%;
-    --primary-foreground: 45 50% 95%;
+    /* Primary: DeepSeek Purple */
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 262 83% 55%;
+    --primary-light: 262 83% 95%;
     
-    /* Secondary: 부드러운 베이지 (현대적 감성) */
-    --secondary: 45 25% 92%;
-    --secondary-foreground: 28 30% 25%;
+    /* Secondary: Soft Gray */
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 13% 9%;
+    --secondary-hover: 220 14% 93%;
     
-    /* Accent: 금색 계열 (고급스러운 포인트) */
-    --accent: 45 60% 75%;
-    --accent-foreground: 28 30% 25%;
+    /* Accent: Gradient Pink */
+    --accent: 338 100% 67%;
+    --accent-foreground: 0 0% 100%;
+    --accent-hover: 338 100% 64%;
+    --accent-light: 338 100% 95%;
     
-    /* 그레이스케일: 따뜻한 톤 */
-    --muted: 45 15% 95%;
-    --muted-foreground: 28 10% 50%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 45 15% 88%;
-    --input: 45 15% 88%;
-    --ring: 28 30% 25%;
-    --radius: 0.75rem;
+    /* Muted Colors */
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Borders & Inputs */
+    --border: 220 13% 92%;
+    --border-secondary: 220 13% 88%;
+    --input: 220 13% 96%;
+    --ring: 262 83% 58%;
+    
+    /* Border Radius */
+    --radius: 1rem;
+    --radius-sm: 0.5rem;
+    --radius-lg: 1.5rem;
+    --radius-xl: 2rem;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-glass: 0 8px 32px 0 rgb(31 38 135 / 0.15);
     
     /* 사주 차트 전용 컬러 (오행 기반) */
-    --chart-1: 28 60% 55%; /* 토(土) - 황토색 */
-    --chart-2: 200 50% 40%; /* 수(水) - 청색 */
-    --chart-3: 120 40% 35%; /* 목(木) - 녹색 */
-    --chart-4: 0 70% 50%; /* 화(火) - 적색 */
-    --chart-5: 50 30% 85%; /* 금(金) - 백금색 */
+    --chart-1: 28 70% 60%; /* 토(土) - 따뜻한 황토색 */
+    --chart-2: 220 70% 55%; /* 수(水) - 깊은 청색 */
+    --chart-3: 150 60% 45%; /* 목(木) - 생명감 있는 녹색 */
+    --chart-4: 10 80% 60%; /* 화(火) - 활력 있는 적색 */
+    --chart-5: 45 40% 70%; /* 금(金) - 고급스러운 금색 */
   }
 
   .dark {
-    /* 다크모드: 깊은 브라운 베이스 */
-    --background: 28 20% 8%;
-    --foreground: 45 40% 90%;
-    --card: 28 15% 12%;
-    --card-foreground: 45 40% 90%;
-    --popover: 28 15% 12%;
-    --popover-foreground: 45 40% 90%;
+    /* DeepSeek Dark Mode */
+    --background: 220 13% 9%;
+    --background-secondary: 220 13% 11%;
+    --background-tertiary: 220 13% 13%;
+    --foreground: 220 9% 95%;
+    --foreground-secondary: 220 9% 70%;
+    --foreground-muted: 220 9% 55%;
     
-    /* Primary: 밝은 골드 톤 */
-    --primary: 45 50% 70%;
-    --primary-foreground: 28 20% 8%;
+    /* Card & Surface with Glass Effect */
+    --card: 220 13% 11%;
+    --card-foreground: 220 9% 95%;
+    --card-border: 220 13% 20%;
+    --glass: 220 13% 11%;
+    --glass-border: 220 13% 25%;
     
-    /* Secondary: 다크 브라운 */
-    --secondary: 28 15% 18%;
-    --secondary-foreground: 45 40% 90%;
+    /* Primary: Bright Purple */
+    --primary: 262 83% 65%;
+    --primary-foreground: 220 13% 9%;
+    --primary-hover: 262 83% 70%;
+    --primary-light: 262 83% 15%;
     
-    /* Accent: 따뜻한 골드 */
-    --accent: 45 45% 60%;
-    --accent-foreground: 28 20% 8%;
+    /* Secondary: Dark Gray */
+    --secondary: 220 13% 15%;
+    --secondary-foreground: 220 9% 95%;
+    --secondary-hover: 220 13% 18%;
     
-    /* 그레이스케일: 따뜻한 다크 톤 */
-    --muted: 28 10% 15%;
-    --muted-foreground: 45 20% 65%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 28 10% 20%;
-    --input: 28 10% 20%;
-    --ring: 45 50% 70%;
+    /* Accent: Bright Pink */
+    --accent: 338 100% 70%;
+    --accent-foreground: 220 13% 9%;
+    --accent-hover: 338 100% 75%;
+    --accent-light: 338 100% 15%;
+    
+    /* Muted Colors */
+    --muted: 220 13% 15%;
+    --muted-foreground: 220 9% 65%;
+    --destructive: 0 84% 65%;
+    --destructive-foreground: 220 13% 9%;
+    
+    /* Borders & Inputs */
+    --border: 220 13% 20%;
+    --border-secondary: 220 13% 25%;
+    --input: 220 13% 15%;
+    --ring: 262 83% 65%;
     
     /* 다크모드 차트 컬러 (오행 기반) */
-    --chart-1: 28 50% 65%; /* 토(土) - 밝은 황토색 */
-    --chart-2: 200 60% 60%; /* 수(水) - 밝은 청색 */
-    --chart-3: 120 50% 55%; /* 목(木) - 밝은 녹색 */
-    --chart-4: 0 70% 65%; /* 화(火) - 밝은 적색 */
-    --chart-5: 50 40% 75%; /* 금(金) - 밝은 백금색 */
+    --chart-1: 28 70% 70%; /* 토(土) - 밝은 황토색 */
+    --chart-2: 220 70% 65%; /* 수(水) - 밝은 청색 */
+    --chart-3: 150 60% 55%; /* 목(木) - 밝은 녹색 */
+    --chart-4: 10 80% 70%; /* 화(火) - 밝은 적색 */
+    --chart-5: 45 40% 80%; /* 금(金) - 밝은 금색 */
   }
 }
 
@@ -87,6 +129,8 @@
   }
   body {
     @apply bg-background text-foreground font-sans;
+    background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--background-secondary)) 100%);
+    min-height: 100vh;
   }
   
   /* 타이포그래피 스타일 정의 */
@@ -102,5 +146,136 @@
   /* 숫자 및 데이터 표시용 */
   .saju-data {
     @apply font-mono tabular-nums;
+  }
+}
+
+@layer components {
+  /* DeepSeek Style Glass Card */
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-lg border border-white/20;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  }
+  
+  .dark .glass-card {
+    @apply bg-gray-900/80 border-gray-700/30;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Gradient Button */
+  .gradient-button {
+    @apply relative overflow-hidden;
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .gradient-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.3);
+  }
+  
+  .gradient-button:active {
+    transform: translateY(0);
+  }
+  
+  /* Modern Card */
+  .modern-card {
+    @apply bg-card border border-border rounded-2xl;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .modern-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px -4px rgba(0, 0, 0, 0.12);
+  }
+  
+  /* Floating Animation */
+  .floating {
+    animation: floating 3s ease-in-out infinite;
+  }
+  
+  @keyframes floating {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  /* Shimmer Effect */
+  .shimmer {
+    background: linear-gradient(90deg, 
+      hsl(var(--muted)) 25%, 
+      hsl(var(--background)) 50%, 
+      hsl(var(--muted)) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
+  /* Pulse Animation */
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes pulse-glow {
+    from { box-shadow: 0 0 20px -10px hsl(var(--primary)); }
+    to { box-shadow: 0 0 30px -5px hsl(var(--primary)); }
+  }
+  
+  /* Gradient Text */
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Smooth Scroll */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+  }
+  
+  /* Hide Scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer utilities {
+  /* Animation Delays */
+  .delay-100 { animation-delay: 100ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-500 { animation-delay: 500ms; }
+  
+  /* Touch Friendly */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  
+  /* Backdrop Blur Utilities */
+  .backdrop-blur-glass {
+    backdrop-filter: blur(16px) saturate(180%);
+  }
+  
+  /* Custom Border Radius */
+  .rounded-deepseek {
+    border-radius: 1rem;
+  }
+  
+  .rounded-deepseek-lg {
+    border-radius: 1.5rem;
+  }
+  
+  .rounded-deepseek-xl {
+    border-radius: 2rem;
   }
 }
