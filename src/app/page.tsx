@@ -34,7 +34,7 @@ export default function Home() {
 								전통과 현대의 만남
 							</Badge>
 							<h1 className="text-4xl md:text-6xl font-serif font-bold text-foreground tracking-tight">
-								사주나우
+								개-사주
 							</h1>
 							<p className="text-xl md:text-2xl text-muted-foreground font-light">
 								전통 사주를 현대적이고 감성적인 UI로
@@ -111,7 +111,7 @@ export default function Home() {
 				<div className="container mx-auto px-4">
 					<div className="text-center space-y-4 mb-12">
 						<h2 className="text-3xl font-serif font-bold text-foreground">
-							사주나우의 특별함
+							개-사주의 특별함
 						</h2>
 						<p className="text-lg text-muted-foreground">
 							MZ 세대를 위한 감성적이고 직관적인 사주 서비스
@@ -178,7 +178,7 @@ export default function Home() {
 							지금 바로 시작해보세요
 						</h2>
 						<p className="text-lg text-muted-foreground">
-							무료로 제공되는 사주나우 서비스로
+							무료로 제공되는 개-사주 서비스로
 							<br />
 							나의 운명을 더 깊이 이해해보세요
 						</p>

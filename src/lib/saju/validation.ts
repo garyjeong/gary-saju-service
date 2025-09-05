@@ -1,5 +1,5 @@
 /**
- * 사주나우 입력 검증 스키마
+ * 개-사주 입력 검증 스키마
  * T-003: Zod를 사용한 강력한 입력 검증 시스템
  */
 
@@ -15,6 +15,16 @@ export const SajuInputSchema = z.object({
 	birthDate: z
 		.string()
 		.regex(/^\d{4}-\d{2}-\d{2}$/, "올바른 날짜 형식(YYYY-MM-DD)을 입력해주세요")
+		.refine((date) => {
+			// 유효한 날짜인지 확인 (2월 30일 같은 존재하지 않는 날짜 방지)
+			const [year, month, day] = date.split("-").map(Number);
+			const parsedDate = new Date(year, month - 1, day);
+			return (
+				parsedDate.getFullYear() === year &&
+				parsedDate.getMonth() === month - 1 &&
+				parsedDate.getDate() === day
+			);
+		}, "존재하지 않는 날짜입니다")
 		.refine((date) => {
 			const parsedDate = new Date(date);
 			const today = new Date();

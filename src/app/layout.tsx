@@ -27,7 +27,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: '사주나우 - 현대적 감성의 사주 풀이',
+  title: '개-사주 - 현대적 감성의 사주 풀이',
   description: '전통 사주를 현대적이고 감성적인 UI로 쉽고 재미있게 체험하며, SNS로 공유할 수 있는 웹 서비스',
 };
 

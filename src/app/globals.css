@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    /* 사주나우 브랜드 컬러 팔레트 */
+    /* 개-사주 브랜드 컬러 팔레트 */
     --background: 0 0% 100%;
     --foreground: 28 15% 15%;
     --card: 0 0% 100%;

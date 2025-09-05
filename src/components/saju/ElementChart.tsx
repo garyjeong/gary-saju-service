@@ -47,7 +47,7 @@ export default function ElementChart({ elements, className }: ElementChartProps)
 		},
 	];
 
-	const maxValue = Math.max(...elementData.map((d) => d.value));
+	const maxValue = Math.max(...elementData.map((d) => d.value)) || 1; // 0으로 나누기 방지
 
 	return (
 		<div className={className}>
@@ -91,7 +91,7 @@ export default function ElementChart({ elements, className }: ElementChartProps)
 					<div className="relative w-48 h-48">
 						<svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
 							{elementData.map((element, index) => {
-								const total = elementData.reduce((sum, el) => sum + el.value, 0);
+								const total = elementData.reduce((sum, el) => sum + el.value, 0) || 1; // 0으로 나누기 방지
 								const percentage = (element.value / total) * 100;
 								const offset = elementData
 									.slice(0, index)

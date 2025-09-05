@@ -11,7 +11,7 @@ export default function Footer() {
 					{/* 브랜드 정보 */}
 					<div className="space-y-3">
 						<h3 className="text-lg font-serif font-medium text-foreground">
-							사주나우
+							개-사주
 						</h3>
 						<p className="text-sm text-muted-foreground leading-relaxed">
 							전통 사주를 현대적이고 감성적인 UI로
@@ -68,7 +68,7 @@ export default function Footer() {
 				{/* 하단 정보 */}
 				<div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
 					<p className="text-xs text-muted-foreground">
-						© 2024 사주나우. Made with{" "}
+						© 2024 개-사주. Made with{" "}
 						<Heart className="w-3 h-3 inline mx-1 text-red-500" /> for
 						learning.
 					</p>

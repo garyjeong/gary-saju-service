@@ -17,7 +17,7 @@ export default function Header() {
 						<Sparkles className="w-5 h-5 text-primary-foreground" />
 					</div>
 					<span className="text-xl font-serif font-medium text-foreground">
-						사주나우
+						개-사주
 					</span>
 				</Link>
 

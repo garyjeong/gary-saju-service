@@ -59,7 +59,7 @@ export default function SharePage() {
 											<Sparkles className="w-5 h-5 text-primary-foreground" />
 										</div>
 										<span className="text-lg font-serif font-medium">
-											사주나우
+											개-사주
 										</span>
 									</div>
 
@@ -118,7 +118,7 @@ export default function SharePage() {
 
 									{/* 푸터 */}
 									<div className="text-xs text-muted-foreground opacity-60">
-										사주나우에서 무료로 확인해보세요
+										개-사주에서 무료로 확인해보세요
 									</div>
 								</CardContent>
 							</Card>

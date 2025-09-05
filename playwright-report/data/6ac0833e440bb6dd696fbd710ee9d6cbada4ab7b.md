@@ -1,0 +1,42 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - paragraph [ref=e5]: Prompt Booster
+        - paragraph [ref=e6]: AI 코딩 도우미를 위한 프롬프트 개선 도구
+    - main [ref=e7]:
+      - generic [ref=e9]:
+        - button "API 키 설정" [ref=e11] [cursor=pointer]:
+          - img [ref=e13] [cursor=pointer]
+          - text: API 키 설정
+        - generic [ref=e16]:
+          - alert [ref=e17]:
+            - img [ref=e19]
+            - paragraph [ref=e22]:
+              - strong [ref=e23]: "서버 API Key 모드:"
+              - text: 서버에서 제공하는 AI API를 사용 중입니다. 개인 API Key를 설정하면 더 많은 기능을 사용할 수 있습니다.
+          - group [ref=e24]:
+            - generic [ref=e26]:
+              - paragraph [ref=e27]: 원본 프롬프트를 입력하세요
+              - paragraph [ref=e28]: 0/2000자
+            - textbox "원본 프롬프트를 입력하세요 0/2000자" [ref=e29]
+            - generic [ref=e30]:
+              - progressbar
+          - button "프롬프트 개선하기" [disabled] [ref=e31]
+        - paragraph [ref=e33]: 프롬프트를 입력하고 개선 버튼을 클릭하면 결과가 여기에 표시됩니다.
+    - contentinfo [ref=e34]:
+      - paragraph [ref=e36]: © 2025 Prompt Booster. AI로 더 나은 프롬프트를 만들어보세요.
+  - button "Open Next.js Dev Tools" [ref=e42] [cursor=pointer]:
+    - img [ref=e43] [cursor=pointer]
+  - alert [ref=e46]
+  - generic:
+    - region "Notifications-top"
+    - region "Notifications-top-left"
+    - region "Notifications-top-right"
+    - region "Notifications-bottom-left"
+    - region "Notifications-bottom"
+    - region "Notifications-bottom-right"
+```

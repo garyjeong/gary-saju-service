@@ -4,11 +4,11 @@ interface LuckData {
 	year: number;
 	theme: string;
 	score: number;
-	keywords: string[];
+	keywords: readonly string[];
 }
 
 interface LuckTimelineProps {
-	yearlyLuck: LuckData[];
+	yearlyLuck: readonly LuckData[];
 	className?: string;
 }
 
