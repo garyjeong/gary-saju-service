@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import { Noto_Sans_KR, Noto_Serif_KR, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Providers from './providers';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import AnalyticsProvider from './analytics-provider';
 
 // Primary Font: 한글 가독성이 우수한 Noto Sans KR
 const notoSansKR = Noto_Sans_KR({
@@ -41,7 +44,12 @@ export default function RootLayout({
       <body
         className={`${notoSansKR.variable} ${notoSerifKR.variable} ${geistMono.variable} font-sans antialiased`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <AnalyticsProvider />
+        </Providers>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

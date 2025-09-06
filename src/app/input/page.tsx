@@ -18,6 +18,7 @@ import { Calendar, Clock, ArrowRight, User, Loader2, Smartphone, AlertCircle, Br
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { trackSajuEvent, PagePerformanceTracker } from "@/lib/analytics/vercel-analytics";
 
 export default function InputPage() {
 	const router = useRouter();
@@ -47,7 +48,7 @@ export default function InputPage() {
 	const watchedGender = watch("gender");
 	const watchedBirthTime = watch("birthTime");
 
-	// 모바일 환경 감지
+	// 모바일 환경 감지 및 분석 추적
 	React.useEffect(() => {
 		const checkMobile = () => {
 			setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window);
@@ -56,7 +57,16 @@ export default function InputPage() {
 		checkMobile();
 		window.addEventListener('resize', checkMobile);
 		
-		return () => window.removeEventListener('resize', checkMobile);
+		// 사주 입력 페이지 방문 추적
+		trackSajuEvent.inputStart();
+		
+		// 성능 측정 시작
+		const performanceTracker = new PagePerformanceTracker('input');
+		
+		return () => {
+			window.removeEventListener('resize', checkMobile);
+			performanceTracker.complete();
+		};
 	}, []);
 
 	const onSubmit = async (data: SajuInputType) => {
@@ -95,6 +105,13 @@ export default function InputPage() {
 			sessionStorage.setItem("sajuResult", JSON.stringify(result));
 			sessionStorage.setItem("sajuInput", JSON.stringify(data));
 			
+			// 사주 계산 완료 추적
+			trackSajuEvent.calculationComplete({
+				birthYear: new Date(data.birthDate).getFullYear(),
+				gender: data.gender,
+				hasTime: !!data.birthTime,
+			});
+			
 			nextStep(); // 5단계: 완료
 			await new Promise(resolve => setTimeout(resolve, 300));
 			
@@ -102,11 +119,14 @@ export default function InputPage() {
 			router.push("/result");
 		} catch (error) {
 			console.error("사주 계산 오류:", error);
-			setCalculationError(
-				error instanceof Error 
-					? error.message 
-					: "사주 계산 중 오류가 발생했습니다. 다시 시도해주세요."
-			);
+			const errorMessage = error instanceof Error 
+				? error.message 
+				: "사주 계산 중 오류가 발생했습니다. 다시 시도해주세요.";
+			
+			setCalculationError(errorMessage);
+			
+			// 에러 추적
+			trackSajuEvent.error('calculation', errorMessage);
 		} finally {
 			setIsCalculating(false);
 		}

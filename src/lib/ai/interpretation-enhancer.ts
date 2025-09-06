@@ -4,12 +4,14 @@
  */
 
 import {
-	openai,
+	googleAI,
+	getGeminiModel,
 	AIInterpretationRequest,
 	AIInterpretationResponse,
 	AIServiceError,
 	validateAIRequest,
-} from "./openai-client";
+	parseGeminiResponse,
+} from "./google-ai-client";
 import {
 	generatePersonalizedPrompt,
 	generateSimplePrompt,
@@ -38,11 +40,11 @@ export class InterpretationEnhancer {
 			// AI 프롬프트 생성
 			const prompt = generatePersonalizedPrompt(request);
 
-			// OpenAI API 호출
-			const aiResponse = await this.callOpenAI(prompt);
+			// Google AI API 호출
+			const aiResponse = await this.callGemini(prompt);
 
 			// 응답 파싱 및 검증
-			const enhancedInterpretation = this.parseAIResponse(aiResponse);
+			const enhancedInterpretation = parseGeminiResponse(aiResponse);
 
 			const processingTime = Date.now() - startTime;
 
@@ -50,7 +52,7 @@ export class InterpretationEnhancer {
 				enhancedInterpretation,
 				metadata: {
 					processingTime,
-					model: "gpt-4",
+					model: "gemini-1.5-flash",
 					cached: false,
 				},
 			};
@@ -66,31 +68,28 @@ export class InterpretationEnhancer {
 	}
 
 	/**
-	 * OpenAI API 호출 (재시도 로직 포함)
+	 * Google AI API 호출 (재시도 로직 포함)
 	 */
-	private async callOpenAI(prompt: string, retryCount = 0): Promise<string> {
+	private async callGemini(prompt: string, retryCount = 0): Promise<string> {
 		try {
-			const completion = await openai.chat.completions.create({
-				model: "gpt-4",
-				messages: [
-					{
-						role: "system",
-						content:
-							"당신은 전문적인 사주 해석가입니다. 항상 JSON 형식으로만 응답하며, 건설적이고 희망적인 조언을 제공합니다.",
-					},
-					{
-						role: "user",
-						content: prompt,
-					},
-				],
-				max_tokens: 2000,
-				temperature: 0.7,
-				top_p: 0.9,
-				frequency_penalty: 0.1,
-				presence_penalty: 0.1,
+			const model = getGeminiModel();
+
+			// Google AI 프롬프트 포맷팅
+			const fullPrompt = `당신은 전문적인 사주 해석가입니다. 항상 JSON 형식으로만 응답하며, 건설적이고 희망적인 조언을 제공합니다.
+
+${prompt}`;
+
+			const result = await model.generateContent({
+				contents: [{ role: "user", parts: [{ text: fullPrompt }] }],
+				generationConfig: {
+					maxOutputTokens: 2000,
+					temperature: 0.7,
+					topP: 0.9,
+				},
 			});
 
-			const content = completion.choices[0]?.message?.content;
+			const response = await result.response;
+			const content = response.text();
 
 			if (!content) {
 				throw new AIServiceError(
@@ -102,7 +101,7 @@ export class InterpretationEnhancer {
 			return content;
 		} catch (error: any) {
 			console.error(
-				`OpenAI API 호출 실패 (시도 ${retryCount + 1}/${this.maxRetries}):`,
+				`Google AI API 호출 실패 (시도 ${retryCount + 1}/${this.maxRetries}):`,
 				error
 			);
 
@@ -110,16 +109,19 @@ export class InterpretationEnhancer {
 			if (retryCount < this.maxRetries - 1) {
 				const delay = Math.pow(2, retryCount) * 1000; // 지수 백오프
 				await new Promise((resolve) => setTimeout(resolve, delay));
-				return this.callOpenAI(prompt, retryCount + 1);
+				return this.callGemini(prompt, retryCount + 1);
 			}
 
 			// 최대 재시도 횟수 초과시 에러 발생
-			if (error.code === "insufficient_quota") {
+			if (
+				error.message?.includes("quota") ||
+				error.message?.includes("limit")
+			) {
 				throw new AIServiceError(
 					"API 사용량이 초과되었습니다",
 					"QUOTA_EXCEEDED"
 				);
-			} else if (error.code === "rate_limit_exceeded") {
+			} else if (error.message?.includes("rate")) {
 				throw new AIServiceError(
 					"요청이 너무 빈번합니다. 잠시 후 다시 시도해주세요",
 					"RATE_LIMITED"
@@ -134,70 +136,7 @@ export class InterpretationEnhancer {
 		}
 	}
 
-	/**
-	 * AI 응답 파싱 및 검증
-	 */
-	private parseAIResponse(response: string): any {
-		try {
-			// JSON 추출 (```json 코드 블록 형태로 올 수 있음)
-			let jsonString = response.trim();
-
-			if (jsonString.includes("```json")) {
-				const match = jsonString.match(/```json\s*([\s\S]*?)\s*```/);
-				if (match) {
-					jsonString = match[1];
-				}
-			} else if (jsonString.includes("```")) {
-				const match = jsonString.match(/```\s*([\s\S]*?)\s*```/);
-				if (match) {
-					jsonString = match[1];
-				}
-			}
-
-			const parsed = JSON.parse(jsonString);
-
-			// 필수 필드 검증
-			const requiredFields = [
-				"personality",
-				"strengths",
-				"challenges",
-				"summary",
-			];
-			for (const field of requiredFields) {
-				if (
-					!parsed[field] ||
-					typeof parsed[field] !== "string" ||
-					parsed[field].trim().length === 0
-				) {
-					throw new Error(`필수 필드 누락: ${field}`);
-				}
-			}
-
-			// 옵셔널 필드 기본값 설정
-			return {
-				personality: parsed.personality.trim(),
-				strengths: parsed.strengths.trim(),
-				challenges: parsed.challenges.trim(),
-				summary: parsed.summary.trim(),
-				lifeAdvice:
-					parsed.lifeAdvice?.trim() ||
-					"매일 조금씩 성장하는 자신을 믿고 나아가세요.",
-				careerGuidance:
-					parsed.careerGuidance?.trim() ||
-					"본인의 강점을 살려 꾸준히 발전시켜 나가세요.",
-				relationshipTips:
-					parsed.relationshipTips?.trim() ||
-					"진실한 마음으로 사람들과 소통하며 좋은 관계를 유지하세요.",
-			};
-		} catch (error) {
-			console.error("AI 응답 파싱 실패:", error);
-			throw new AIServiceError(
-				"AI 응답 형식이 올바르지 않습니다",
-				"PARSE_ERROR",
-				{ response, error }
-			);
-		}
-	}
+	// parseAIResponse 메서드를 제거하고 google-ai-client의 parseGeminiResponse 함수 사용
 
 	/**
 	 * 폴백 해석 생성 (AI 실패 시)
@@ -209,15 +148,15 @@ export class InterpretationEnhancer {
 		try {
 			// 간단한 프롬프트로 재시도
 			const fallbackPrompt = generateFallbackPrompt(request.sajuResult);
-			const response = await this.callOpenAI(fallbackPrompt);
+			const response = await this.callGemini(fallbackPrompt);
 
-			const enhancedInterpretation = this.parseAIResponse(response);
+			const enhancedInterpretation = parseGeminiResponse(response);
 
 			return {
 				enhancedInterpretation,
 				metadata: {
 					processingTime,
-					model: "gpt-4-fallback",
+					model: "gemini-1.5-flash-fallback",
 					cached: false,
 				},
 			};
@@ -272,7 +211,7 @@ export class InterpretationEnhancer {
 	async generateSimpleInterpretation(sajuResult: any): Promise<any> {
 		try {
 			const prompt = generateSimplePrompt(sajuResult);
-			const response = await this.callOpenAI(prompt);
+			const response = await this.callGemini(prompt);
 			return JSON.parse(response);
 		} catch (error) {
 			console.error("간단한 해석 생성 실패:", error);

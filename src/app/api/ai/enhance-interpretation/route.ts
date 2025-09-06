@@ -13,7 +13,7 @@ import {
 import {
 	AIInterpretationRequest,
 	AIServiceError,
-} from "@/lib/ai/openai-client";
+} from "@/lib/ai/google-ai-client";
 
 /**
  * AI 해석 강화 API 핸들러

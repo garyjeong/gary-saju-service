@@ -6,7 +6,7 @@
 import {
 	AIInterpretationRequest,
 	AIInterpretationResponse,
-} from "./openai-client";
+} from "./google-ai-client";
 
 /**
  * 캐시 엔트리 타입

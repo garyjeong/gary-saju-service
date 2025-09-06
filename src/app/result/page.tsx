@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { trackSajuEvent, trackUserBehavior, PagePerformanceTracker } from "@/lib/analytics/vercel-analytics";
 import { Button } from "@/components/ui/button";
 import { SajuResultSkeleton } from "@/components/ui/enhanced-loading";
 import Header from "@/components/layout/Header";
@@ -13,8 +14,11 @@ import LuckTimeline from "@/components/saju/LuckTimeline";
 import { DUMMY_SAJU_RESULT } from "@/data/dummy";
 import { SajuResult } from "@/lib/saju/types";
 import { SajuInputType } from "@/lib/saju/validation";
-import { useAIInterpretation } from "@/hooks/useAIInterpretation";
-import { Share2, ArrowLeft, Download, Loader2, Smartphone, Sparkles } from "lucide-react";
+import { useAIInterpretation, UserProfile } from "@/hooks/useAIInterpretation";
+import UserProfileModal from "@/components/saju/UserProfileModal";
+import { Share2, ArrowLeft, Download, Loader2, Smartphone, Sparkles, Settings } from "lucide-react";
+import { AIStageLoading } from "@/components/ui/ai-loading";
+import { AIServiceError } from "@/components/ui/enhanced-error";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -31,6 +35,12 @@ export default function ResultPage() {
 	const [sajuInput, setSajuInput] = useState<SajuInputType | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isMobile, setIsMobile] = useState(false);
+	const [showProfileModal, setShowProfileModal] = useState(false);
+	const [currentProfile, setCurrentProfile] = useState<UserProfile>({
+		tone: 'casual',
+		interests: ['career', 'love']
+	});
+	const [aiStage, setAiStage] = useState<"analyzing" | "enhancing" | "personalizing" | "finalizing">("analyzing");
 	
 	// AI 해석 훅
 	const { 
@@ -66,16 +76,27 @@ export default function ResultPage() {
 				setSajuResult(result);
 				setSajuInput(input);
 				
+				// 기본 프로필 설정
+				const defaultProfile: UserProfile = {
+					age: input.birthDate ? new Date().getFullYear() - new Date(input.birthDate).getFullYear() : undefined,
+					gender: input.gender,
+					tone: 'casual',
+					interests: ['career', 'love']
+				};
+				setCurrentProfile(defaultProfile);
+
 				// AI 해석 자동 실행 (기본 프로필로)
 				if (result && !isEnhanced) {
-					enhanceInterpretation(result, {
-						age: input.birthDate ? new Date().getFullYear() - new Date(input.birthDate).getFullYear() : undefined,
-						gender: input.gender,
-						tone: 'casual',
-						interests: ['career', 'love']
-					}).catch(error => {
-						console.log('AI 해석 실패 (기본 해석 사용):', error);
-					});
+					enhanceInterpretation(result, defaultProfile)
+						.then((aiResult) => {
+							// AI 해석 결과를 세션 스토리지에 저장 (공유용)
+							if (aiResult) {
+								sessionStorage.setItem("aiInterpretation", JSON.stringify(aiResult));
+							}
+						})
+						.catch(error => {
+							console.log('AI 해석 실패 (기본 해석 사용):', error);
+						});
 				}
 			} else {
 				// 데이터가 없으면 입력 페이지로 리다이렉트
@@ -90,6 +111,38 @@ export default function ResultPage() {
 			setIsLoading(false);
 		}
 	}, [router, enhanceInterpretation, isEnhanced]);
+
+	// AI 재해석 함수 (단계별 시뮬레이션 포함)
+	const handleAIReinterpretation = async (profile?: UserProfile) => {
+		if (!sajuResult) return;
+		
+		const profileToUse = profile || currentProfile;
+		setCurrentProfile(profileToUse);
+
+		// 단계별 로딩 시뮬레이션
+		const stages: Array<"analyzing" | "enhancing" | "personalizing" | "finalizing"> = 
+			["analyzing", "enhancing", "personalizing", "finalizing"];
+		
+		let currentStageIndex = 0;
+		const stageInterval = setInterval(() => {
+			if (currentStageIndex < stages.length - 1) {
+				currentStageIndex++;
+				setAiStage(stages[currentStageIndex]);
+			}
+		}, 2000);
+
+		try {
+			const aiResult = await enhanceInterpretation(sajuResult, profileToUse);
+			// AI 해석 결과를 세션 스토리지에 저장
+			if (aiResult) {
+				sessionStorage.setItem("aiInterpretation", JSON.stringify(aiResult));
+			}
+			clearInterval(stageInterval);
+		} catch (error) {
+			clearInterval(stageInterval);
+			setAiStage("analyzing");
+		}
+	};
 
 	if (isLoading) {
 		return (
@@ -159,17 +212,44 @@ export default function ResultPage() {
 								<div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-3xl blur-xl opacity-50"></div>
 							</div>
 
-							{/* AI 해석 상태 표시 */}
+							{/* AI 해석 상태 표시 - Enhanced */}
 							{isAILoading && (
-								<div className="inline-flex items-center gap-3 px-6 py-3 bg-primary/10 rounded-2xl backdrop-blur-sm">
-									<Loader2 className="w-5 h-5 animate-spin text-primary" />
-									<span className="text-primary font-medium">AI 개인화 해석 생성 중...</span>
+								<div className="w-full max-w-md mx-auto">
+									<AIStageLoading currentStage={aiStage} />
 								</div>
 							)}
-							{isEnhanced && !isAILoading && (
-								<div className="inline-flex items-center gap-3 px-6 py-3 bg-accent/10 rounded-2xl backdrop-blur-sm">
-									<Sparkles className="w-5 h-5 text-accent" />
-									<span className="text-accent font-medium">AI 개인화 해석 적용됨</span>
+							{/* AI 해석 완료 및 에러 상태 */}
+							{!isAILoading && (
+								<div className="space-y-4">
+									{aiError && (
+										<div className="max-w-md mx-auto">
+											<AIServiceError 
+												error={aiError}
+												onRetry={() => handleAIReinterpretation()}
+												onFallback={() => {
+													// 에러 상태 초기화하고 기본 해석 사용
+													console.log("기본 해석으로 폴백");
+												}}
+											/>
+										</div>
+									)}
+									{isEnhanced && !aiError && (
+										<div className="flex items-center gap-4 flex-wrap justify-center">
+											<div className="inline-flex items-center gap-3 px-6 py-3 bg-accent/10 rounded-2xl backdrop-blur-sm">
+												<Sparkles className="w-5 h-5 text-accent" />
+												<span className="text-accent font-medium">AI 개인화 해석 적용됨</span>
+											</div>
+											<Button
+												variant="ghost"
+												size="sm"
+												onClick={() => setShowProfileModal(true)}
+												className="glass-card gap-2 px-4 py-2 rounded-xl hover:bg-accent/10"
+											>
+												<Settings className="w-4 h-4 text-accent" />
+												<span className="text-sm">개인화 설정</span>
+											</Button>
+										</div>
+									)}
 								</div>
 							)}
 
@@ -279,27 +359,32 @@ export default function ResultPage() {
 							</div>
 						</div>
 						
-						{/* AI 재해석 버튼 */}
+						{/* AI 재해석 버튼들 */}
 						{!isAILoading && (
-							<div className="pt-4">
-								<Button
-									variant="ghost"
-									size="lg"
-									className="glass-card gap-3 px-6 py-3 rounded-xl group hover:bg-accent/10 transition-all duration-300"
-									onClick={() => {
-										if (sajuResult) {
-											enhanceInterpretation(sajuResult, {
-												age: sajuInput?.birthDate ? new Date().getFullYear() - new Date(sajuInput.birthDate).getFullYear() : undefined,
-												gender: sajuInput?.gender,
-												tone: 'poetic',
-												interests: ['growth', 'creativity']
-											});
-										}
-									}}
-								>
-									<Sparkles className="w-5 h-5 text-accent group-hover:scale-110 transition-transform duration-300" />
-									AI 해석 새로고침
-								</Button>
+							<div className="pt-4 space-y-3">
+								<div className="flex flex-wrap justify-center gap-3">
+									<Button
+										variant="ghost"
+										size="lg"
+										className="glass-card gap-3 px-6 py-3 rounded-xl group hover:bg-accent/10 transition-all duration-300"
+										onClick={() => setShowProfileModal(true)}
+									>
+										<Settings className="w-5 h-5 text-accent group-hover:scale-110 transition-transform duration-300" />
+										상세 설정
+									</Button>
+									<Button
+										variant="ghost"
+										size="lg"
+										className="glass-card gap-3 px-6 py-3 rounded-xl group hover:bg-accent/10 transition-all duration-300"
+										onClick={() => handleAIReinterpretation()}
+									>
+										<Sparkles className="w-5 h-5 text-accent group-hover:scale-110 transition-transform duration-300" />
+										새로고침
+									</Button>
+								</div>
+								<p className="text-xs text-muted-foreground text-center">
+									개인화 설정을 조정하여 더 정확한 해석을 받아보세요
+								</p>
 							</div>
 						)}
 					</div>
@@ -330,6 +415,14 @@ export default function ResultPage() {
 			</section>
 
 			<Footer />
+
+			{/* 사용자 프로필 모달 */}
+			<UserProfileModal
+				isOpen={showProfileModal}
+				onClose={() => setShowProfileModal(false)}
+				onSubmit={handleAIReinterpretation}
+				currentProfile={currentProfile}
+			/>
 		</div>
 	);
 }

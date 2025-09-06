@@ -9,7 +9,11 @@ import { useState, useCallback } from "react";
 import {
 	AIInterpretationRequest,
 	AIInterpretationResponse,
-} from "@/lib/ai/openai-client";
+} from "@/lib/ai/google-ai-client";
+import {
+	trackSajuEvent,
+	trackPerformance,
+} from "@/lib/analytics/vercel-analytics";
 
 /**
  * AI 해석 상태 타입
@@ -61,6 +65,16 @@ export function useAIInterpretation() {
 				error: null,
 			}));
 
+			// AI 해석 요청 추적
+			trackSajuEvent.aiInterpretationRequest({
+				profileAge: userProfile?.age,
+				profileGender: userProfile?.gender,
+				profileTone: userProfile?.tone,
+				interests: userProfile?.interests,
+			});
+
+			const startTime = performance.now();
+
 			try {
 				const request: AIInterpretationRequest = {
 					sajuResult,
@@ -81,6 +95,21 @@ export function useAIInterpretation() {
 					throw new Error(result.error || "해석 생성에 실패했습니다");
 				}
 
+				const processingTime = performance.now() - startTime;
+
+				// AI 해석 완료 추적
+				trackSajuEvent.aiInterpretationComplete({
+					processingTime,
+					cached: result.data?.metadata?.cached || false,
+					model: result.data?.metadata?.model || "gemini-1.5-flash",
+				});
+
+				// 성능 추적
+				trackPerformance.aiResponseTime(
+					processingTime,
+					result.data?.metadata?.cached || false
+				);
+
 				setState({
 					data: result.data,
 					isLoading: false,
@@ -94,6 +123,9 @@ export function useAIInterpretation() {
 					error instanceof Error
 						? error.message
 						: "알 수 없는 오류가 발생했습니다";
+
+				// 에러 추적
+				trackSajuEvent.error("ai", errorMessage);
 
 				setState((prev) => ({
 					...prev,
