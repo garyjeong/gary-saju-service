@@ -407,21 +407,21 @@ export default function SajuInputModal({ isOpen, onClose }: SajuInputModalProps)
                 <div className="grid grid-cols-3 gap-3">
                   {/* 년도 선택 */}
                   <div>
-                    <Select
+                    <Input
+                      type="text"
+                      list="year-options"
                       value={formData.birthYear}
-                      onValueChange={(value) => setFormData({ ...formData, birthYear: value })}
-                    >
-                      <SelectTrigger className={cn("h-12", errors.birthYear && "border-destructive")}>
-                        <SelectValue placeholder="년도" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {yearOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      onChange={(e) => setFormData({ ...formData, birthYear: e.target.value })}
+                      placeholder="년도 입력"
+                      className={cn(errors.birthYear && "border-destructive")}
+                    />
+                    <datalist id="year-options">
+                      {yearOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </datalist>
                     {errors.birthYear && (
                       <p className="text-destructive text-xs mt-1">{errors.birthYear}</p>
                     )}
@@ -429,21 +429,21 @@ export default function SajuInputModal({ isOpen, onClose }: SajuInputModalProps)
 
                   {/* 월 선택 */}
                   <div>
-                    <Select
+                    <Input
+                      type="text"
+                      list="month-options"
                       value={formData.birthMonth}
-                      onValueChange={(value) => setFormData({ ...formData, birthMonth: value })}
-                    >
-                      <SelectTrigger className={cn("h-12", errors.birthMonth && "border-destructive")}>
-                        <SelectValue placeholder="월" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {monthOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      onChange={(e) => setFormData({ ...formData, birthMonth: e.target.value })}
+                      placeholder="월 입력"
+                      className={cn(errors.birthMonth && "border-destructive")}
+                    />
+                    <datalist id="month-options">
+                      {monthOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </datalist>
                     {errors.birthMonth && (
                       <p className="text-destructive text-xs mt-1">{errors.birthMonth}</p>
                     )}
@@ -451,21 +451,21 @@ export default function SajuInputModal({ isOpen, onClose }: SajuInputModalProps)
 
                   {/* 일 선택 */}
                   <div>
-                    <Select
+                    <Input
+                      type="text"
+                      list="day-options"
                       value={formData.birthDay}
-                      onValueChange={(value) => setFormData({ ...formData, birthDay: value })}
-                    >
-                      <SelectTrigger className={cn("h-12", errors.birthDay && "border-destructive")}>
-                        <SelectValue placeholder="일" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {getDayOptions().map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      onChange={(e) => setFormData({ ...formData, birthDay: e.target.value })}
+                      placeholder="일 입력"
+                      className={cn(errors.birthDay && "border-destructive")}
+                    />
+                    <datalist id="day-options">
+                      {getDayOptions().map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </datalist>
                     {errors.birthDay && (
                       <p className="text-destructive text-xs mt-1">{errors.birthDay}</p>
                     )}
