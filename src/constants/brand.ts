@@ -1,5 +1,5 @@
 /**
- * 개-사주 브랜드 가이드라인
+ * 개-사주 브랜드 가이드라인 & 디자인 토큰
  * T-001: 컬러 팔레트 및 타이포그래피 가이드라인 정의
  */
 
@@ -38,6 +38,54 @@ export const COLORS = {
 		border: "hsl(45, 15%, 88%)", // 테두리
 		input: "hsl(45, 15%, 88%)", // 입력 필드
 		description: "따뜻한 느낌의 그레이 톤 시스템",
+	},
+} as const;
+
+// ============================================
+// 레이아웃 & 간격 시스템 (Layout & Spacing)
+// ============================================
+
+export const LAYOUT = {
+	// 컨테이너 최대 너비
+	container: {
+		maxWidth: "1200px",
+		padding: {
+			mobile: "1rem", // 16px
+			tablet: "1.5rem", // 24px
+			desktop: "2rem", // 32px
+			wide: "3rem", // 48px
+		},
+	},
+
+	// 섹션 간격
+	spacing: {
+		section: {
+			mobile: "3rem", // 48px
+			desktop: "5rem", // 80px
+		},
+		component: {
+			xs: "0.5rem", // 8px
+			sm: "0.75rem", // 12px
+			md: "1rem", // 16px
+			lg: "1.5rem", // 24px
+			xl: "2rem", // 32px
+			"2xl": "3rem", // 48px
+		},
+	},
+
+	// 카드 및 컴포넌트 크기
+	card: {
+		borderRadius: "0.75rem", // 12px
+		padding: {
+			sm: "1rem", // 16px
+			md: "1.5rem", // 24px
+			lg: "2rem", // 32px
+		},
+		shadow: {
+			sm: "0 2px 8px 0 rgba(0, 0, 0, 0.08)",
+			md: "0 4px 12px 0 rgba(0, 0, 0, 0.12)",
+			lg: "0 8px 24px 0 rgba(0, 0, 0, 0.16)",
+		},
 	},
 } as const;
 

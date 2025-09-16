@@ -13,10 +13,10 @@ interface SajuDisplayProps {
 }
 
 const pillarColors = {
-	"년주": "bg-red-500/20 text-red-700 border-red-200",
-	"월주": "bg-blue-500/20 text-blue-700 border-blue-200",
-	"일주": "bg-green-500/20 text-green-700 border-green-200",
-	"시주": "bg-purple-500/20 text-purple-700 border-purple-200",
+	"년주": "bg-element-fire/20 text-element-fire border-element-fire/30",
+	"월주": "bg-element-water/20 text-element-water border-element-water/30",
+	"일주": "bg-element-wood/20 text-element-wood border-element-wood/30",
+	"시주": "bg-element-metal/20 text-element-metal border-element-metal/30",
 };
 
 export default function SajuDisplay({ pillars }: SajuDisplayProps) {

@@ -26,22 +26,22 @@ const getElementEmoji = (element: string) => {
 
 const getElementGradient = (element: string) => {
 	switch (element) {
-		case "목": return "from-green-400/20 to-emerald-500/20";
-		case "화": return "from-red-400/20 to-orange-500/20";
-		case "토": return "from-yellow-400/20 to-amber-500/20";
-		case "금": return "from-gray-400/20 to-slate-500/20";
-		case "수": return "from-blue-400/20 to-cyan-500/20";
+		case "목": return "from-element-wood/20 to-element-wood/30";
+		case "화": return "from-element-fire/20 to-element-fire/30";
+		case "토": return "from-element-earth/20 to-element-earth/30";
+		case "금": return "from-element-metal/20 to-element-metal/30";
+		case "수": return "from-element-water/20 to-element-water/30";
 		default: return "from-primary/20 to-accent/20";
 	}
 };
 
 const getProgressColor = (element: string) => {
 	switch (element) {
-		case "목": return "bg-green-500";
-		case "화": return "bg-red-500";
-		case "토": return "bg-yellow-500";
-		case "금": return "bg-gray-500";
-		case "수": return "bg-blue-500";
+		case "목": return "bg-element-wood";
+		case "화": return "bg-element-fire";
+		case "토": return "bg-element-earth";
+		case "금": return "bg-element-metal";
+		case "수": return "bg-element-water";
 		default: return "bg-primary";
 	}
 };
