@@ -4,37 +4,37 @@
 
 @layer base {
   :root {
-    /* 개-사주 DeepSeek 스타일 브랜드 팔레트 */
-    --background: 0 0% 100%;
-    --background-secondary: 240 10% 99%;
-    --background-tertiary: 240 5% 97%;
-    --foreground: 220 13% 9%;
-    --foreground-secondary: 220 9% 46%;
-    --foreground-muted: 220 9% 64%;
+    /* 🌟 한국 전통 오방색 기반 색상 시스템 */
+    --background: 0 0% 99%; /* 한지 백색 */
+    --background-secondary: 0 0% 97%; /* 연한 한지색 */
+    --background-tertiary: 0 0% 95%; /* 더 연한 한지색 */
+    --foreground: 0 0% 11%; /* 먹색 (진한 흑색) */
+    --foreground-secondary: 27 54% 29%; /* 흙색 톤 */
+    --foreground-muted: 0 0% 40%; /* 중간 회색 */
     
-    /* Card & Surface with Glass Effect */
-    --card: 0 0% 100%;
-    --card-foreground: 220 13% 9%;
-    --card-border: 220 13% 92%;
-    --glass: 0 0% 100%;
-    --glass-border: 220 13% 91%;
+    /* Card & Surface with 한지 텍스처 효과 */
+    --card: 0 0% 99%;
+    --card-foreground: 0 0% 11%;
+    --card-border: 0 0% 90%;
+    --glass: 0 0% 97%;
+    --glass-border: 0 0% 85%;
     
-    /* Primary: DeepSeek Purple */
-    --primary: 262 83% 58%;
-    --primary-foreground: 0 0% 100%;
-    --primary-hover: 262 83% 55%;
-    --primary-light: 262 83% 95%;
+    /* Primary: 전통 주홍색 (남방 적색) */
+    --primary: 12 88% 43%;
+    --primary-foreground: 0 0% 99%;
+    --primary-hover: 12 88% 38%;
+    --primary-light: 12 88% 95%;
     
-    /* Secondary: Soft Gray */
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 220 13% 9%;
-    --secondary-hover: 220 14% 93%;
+    /* Secondary: 한지 백색 */
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 11%;
+    --secondary-hover: 0 0% 90%;
     
-    /* Accent: Gradient Pink */
-    --accent: 338 100% 67%;
-    --accent-foreground: 0 0% 100%;
-    --accent-hover: 338 100% 64%;
-    --accent-light: 338 100% 95%;
+    /* Accent: 전통 황금색 (서방 황색) */
+    --accent: 41 91% 61%;
+    --accent-foreground: 0 0% 11%;
+    --accent-hover: 41 91% 56%;
+    --accent-light: 41 91% 95%;
     
     /* Muted Colors */
     --muted: 220 14% 96%;
@@ -61,65 +61,65 @@
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     --shadow-glass: 0 8px 32px 0 rgb(31 38 135 / 0.15);
     
-    /* 사주 차트 전용 컬러 (오행 기반) */
-    --chart-1: 28 70% 60%; /* 토(土) - 따뜻한 황토색 */
-    --chart-2: 220 70% 55%; /* 수(水) - 깊은 청색 */
-    --chart-3: 150 60% 45%; /* 목(木) - 생명감 있는 녹색 */
-    --chart-4: 10 80% 60%; /* 화(火) - 활력 있는 적색 */
-    --chart-5: 45 40% 70%; /* 금(金) - 고급스러운 금색 */
+    /* 사주 차트 전용 컬러 (한국 전통 오방색) */
+    --chart-1: 41 91% 61%; /* 황(金/西) - 전통 황금색 */
+    --chart-2: 219 100% 25%; /* 청(水/北) - 진청색 */
+    --chart-3: 99 34% 20%; /* 청목(木/東) - 산색 */
+    --chart-4: 12 88% 43%; /* 주(火/南) - 주홍색 */
+    --chart-5: 27 54% 29%; /* 갈(土/中) - 흙색 */
   }
 
   .dark {
-    /* DeepSeek Dark Mode */
-    --background: 220 13% 9%;
-    --background-secondary: 220 13% 11%;
-    --background-tertiary: 220 13% 13%;
-    --foreground: 220 9% 95%;
-    --foreground-secondary: 220 9% 70%;
-    --foreground-muted: 220 9% 55%;
+    /* 🌙 한국 전통 야간 테마 (음의 기운) */
+    --background: 0 0% 5%; /* 깊은 먹색 */
+    --background-secondary: 0 0% 8%; /* 어둠 속 한지 */
+    --background-tertiary: 0 0% 11%; /* 연한 어둠 */
+    --foreground: 0 0% 95%; /* 달빛색 */
+    --foreground-secondary: 0 0% 80%; /* 연한 달빛 */
+    --foreground-muted: 0 0% 65%; /* 은은한 빛 */
     
-    /* Card & Surface with Glass Effect */
-    --card: 220 13% 11%;
-    --card-foreground: 220 9% 95%;
-    --card-border: 220 13% 20%;
-    --glass: 220 13% 11%;
-    --glass-border: 220 13% 25%;
+    /* Card & Surface with 야간 한지 효과 */
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 95%;
+    --card-border: 0 0% 15%;
+    --glass: 0 0% 11%;
+    --glass-border: 0 0% 20%;
     
-    /* Primary: Bright Purple */
-    --primary: 262 83% 65%;
-    --primary-foreground: 220 13% 9%;
-    --primary-hover: 262 83% 70%;
-    --primary-light: 262 83% 15%;
+    /* Primary: 야간 주홍빛 */
+    --primary: 12 88% 60%;
+    --primary-foreground: 0 0% 5%;
+    --primary-hover: 12 88% 65%;
+    --primary-light: 12 88% 15%;
     
-    /* Secondary: Dark Gray */
-    --secondary: 220 13% 15%;
-    --secondary-foreground: 220 9% 95%;
-    --secondary-hover: 220 13% 18%;
+    /* Secondary: 야간 한지 */
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 95%;
+    --secondary-hover: 0 0% 15%;
     
-    /* Accent: Bright Pink */
-    --accent: 338 100% 70%;
-    --accent-foreground: 220 13% 9%;
-    --accent-hover: 338 100% 75%;
-    --accent-light: 338 100% 15%;
+    /* Accent: 야간 금빛 */
+    --accent: 41 91% 70%;
+    --accent-foreground: 0 0% 5%;
+    --accent-hover: 41 91% 75%;
+    --accent-light: 41 91% 15%;
     
     /* Muted Colors */
-    --muted: 220 13% 15%;
-    --muted-foreground: 220 9% 65%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
     --destructive: 0 84% 65%;
-    --destructive-foreground: 220 13% 9%;
+    --destructive-foreground: 0 0% 5%;
     
     /* Borders & Inputs */
-    --border: 220 13% 20%;
-    --border-secondary: 220 13% 25%;
-    --input: 220 13% 15%;
-    --ring: 262 83% 65%;
+    --border: 0 0% 18%;
+    --border-secondary: 0 0% 22%;
+    --input: 0 0% 12%;
+    --ring: 41 91% 70%;
     
-    /* 다크모드 차트 컬러 (오행 기반) */
-    --chart-1: 28 70% 70%; /* 토(土) - 밝은 황토색 */
-    --chart-2: 220 70% 65%; /* 수(水) - 밝은 청색 */
-    --chart-3: 150 60% 55%; /* 목(木) - 밝은 녹색 */
-    --chart-4: 10 80% 70%; /* 화(火) - 밝은 적색 */
-    --chart-5: 45 40% 80%; /* 금(金) - 밝은 금색 */
+    /* 다크모드 차트 컬러 (한국 전통 오방색 - 야간 버전) */
+    --chart-1: 41 91% 75%; /* 황(金/西) - 밝은 황금색 */
+    --chart-2: 219 100% 70%; /* 청(水/北) - 밝은 진청색 */
+    --chart-3: 99 50% 60%; /* 청목(木/東) - 밝은 산색 */
+    --chart-4: 12 88% 65%; /* 주(火/南) - 밝은 주홍색 */
+    --chart-5: 27 60% 65%; /* 갈(土/中) - 밝은 흙색 */
   }
 }
 
@@ -133,60 +133,242 @@
     min-height: 100vh;
   }
   
-  /* 타이포그래피 스타일 정의 */
+  /* 🌟 사주나우 전용 타이포그래피 시스템 */
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif;
   }
   
-  /* 사주 해석 텍스트용 스타일 */
-  .saju-interpretation {
-    @apply font-serif text-foreground/90 leading-relaxed;
+  /* 메인 제목 (서예체 느낌) */
+  .title-calligraphy {
+    @apply font-serif font-black text-foreground;
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, 
+      hsl(var(--foreground)) 0%, 
+      hsl(var(--primary)) 50%, 
+      hsl(var(--foreground)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
   
-  /* 숫자 및 데이터 표시용 */
+  /* 부제목 (전통적 느낌) */
+  .subtitle-traditional {
+    @apply font-serif font-medium;
+    color: hsl(var(--foreground-muted));
+    font-size: clamp(1.125rem, 3vw, 1.5rem);
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
+  
+  /* 사주 해석 텍스트 (우아하고 읽기 편한) */
+  .saju-interpretation {
+    @apply font-serif text-foreground/90 leading-relaxed;
+    font-size: clamp(1rem, 2.5vw, 1.125rem);
+    line-height: 1.8;
+    letter-spacing: 0.005em;
+    text-align: justify;
+    text-justify: inter-character;
+  }
+  
+  /* 사주 데이터 (정확하고 명확한) */
   .saju-data {
-    @apply font-mono tabular-nums;
+    @apply font-mono tabular-nums font-semibold;
+    font-size: clamp(0.875rem, 2vw, 1rem);
+    letter-spacing: 0.05em;
+  }
+  
+  /* 강조 텍스트 (중요한 운세 내용) */
+  .emphasis-mystic {
+    @apply font-serif font-semibold;
+    background: linear-gradient(135deg, 
+      hsl(var(--primary)) 0%, 
+      hsl(var(--accent)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  }
+  
+  /* 레이블 텍스트 (차분하고 정보 전달용) */
+  .label-calm {
+    @apply font-sans text-sm;
+    color: hsl(var(--foreground-muted));
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+  
+  /* 큰 숫자 (점수나 중요 수치) */
+  .number-large {
+    @apply font-serif font-bold;
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1;
+    letter-spacing: -0.01em;
+    background: linear-gradient(135deg, 
+      hsl(var(--primary)) 0%, 
+      hsl(var(--accent)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }
 
 @layer components {
-  /* DeepSeek Style Glass Card */
-  .glass-card {
-    @apply bg-white/80 backdrop-blur-lg border border-white/20;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  /* 🌟 사주나우 전용 컴포넌트 스타일 */
+  
+  /* 한지 텍스처 카드 */
+  .hanji-card {
+    @apply bg-card border rounded-2xl;
+    border-color: hsl(var(--card-border));
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(139, 102, 66, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(184, 156, 118, 0.02) 0%, transparent 50%);
+    box-shadow: 
+      0 4px 20px -2px rgba(139, 102, 66, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   }
   
-  .dark .glass-card {
-    @apply bg-gray-900/80 border-gray-700/30;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  .hanji-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 
+      0 20px 60px -8px rgba(139, 102, 66, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
   }
   
-  /* Gradient Button */
-  .gradient-button {
-    @apply relative overflow-hidden;
+  /* 전통 도장 스타일 버튼 */
+  .stamp-button {
+    @apply relative overflow-hidden border-2;
     background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-color: hsl(var(--primary));
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
   }
   
-  .gradient-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.3);
+  .stamp-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s ease;
   }
   
-  .gradient-button:active {
-    transform: translateY(0);
+  .stamp-button:hover::before {
+    left: 100%;
   }
   
-  /* Modern Card */
-  .modern-card {
-    @apply bg-card border border-border rounded-2xl;
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  .stamp-button:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 
+      0 12px 30px -6px rgba(14, 85, 45, 0.4),
+      0 0 20px rgba(14, 85, 45, 0.3);
   }
   
-  .modern-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px -4px rgba(0, 0, 0, 0.12);
+  /* 오행 원소 카드 */
+  .element-card {
+    @apply relative overflow-hidden rounded-2xl border-2;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    background: linear-gradient(135deg, 
+      hsl(var(--background)) 0%, 
+      hsl(var(--background-secondary)) 100%);
+  }
+  
+  .element-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 50%, 
+      rgba(255, 255, 255, 0.1) 0%, 
+      transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .element-card:hover::before {
+    opacity: 1;
+  }
+  
+  .element-card:hover {
+    transform: translateY(-8px) rotateX(5deg);
+    box-shadow: 0 25px 80px -10px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* 음양 회전 애니메이션 로더 */
+  .yin-yang-loader {
+    @apply relative w-12 h-12 rounded-full;
+    background: linear-gradient(90deg, 
+      hsl(var(--foreground)) 50%, 
+      hsl(var(--background)) 50%);
+    animation: yin-yang 2s linear infinite;
+  }
+  
+  .yin-yang-loader::before,
+  .yin-yang-loader::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+  }
+  
+  .yin-yang-loader::before {
+    top: 0;
+    left: 0;
+    background: hsl(var(--background));
+    box-shadow: 0 24px 0 hsl(var(--foreground));
+  }
+  
+  .yin-yang-loader::after {
+    top: 9px;
+    left: 9px;
+    background: hsl(var(--foreground));
+    box-shadow: 0 24px 0 hsl(var(--background));
+  }
+  
+  /* 신비로운 글로우 효과 */
+  .mystic-glow {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .mystic-glow::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(135deg, 
+      hsl(var(--primary)) 0%, 
+      hsl(var(--accent)) 50%, 
+      hsl(var(--primary)) 100%);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    z-index: -1;
+    animation: mystic-glow 3s ease-in-out infinite;
+  }
+  
+  /* 먹 번짐 텍스트 효과 */
+  .ink-text {
+    @apply font-serif;
+    background: linear-gradient(135deg, 
+      hsl(var(--foreground)) 0%, 
+      hsl(var(--foreground-secondary)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.1));
   }
   
   /* Floating Animation */

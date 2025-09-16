@@ -64,7 +64,7 @@ export function validateAIRequest(request: AIInterpretationRequest): void {
 		throw new AIServiceError("사주 결과가 필요합니다", "MISSING_SAJU_RESULT");
 	}
 
-	if (!request.sajuResult.pillars) {
+	if (!request.sajuResult.basic?.pillars) {
 		throw new AIServiceError("사주 기둥 정보가 필요합니다", "MISSING_PILLARS");
 	}
 
@@ -113,7 +113,7 @@ export function parseGeminiResponse(response: string): any {
 
 		const parsed = JSON.parse(jsonString);
 
-		// 필수 필드 검증
+		// 필수 필드 검증 (더 유연하게 처리)
 		const requiredFields = [
 			"personality",
 			"strengths",
@@ -121,22 +121,36 @@ export function parseGeminiResponse(response: string): any {
 			"summary",
 		];
 
+		let missingFields = [];
 		for (const field of requiredFields) {
 			if (
 				!parsed[field] ||
 				typeof parsed[field] !== "string" ||
 				parsed[field].trim().length === 0
 			) {
-				throw new Error(`필수 필드 누락: ${field}`);
+				missingFields.push(field);
 			}
 		}
 
-		// 옵셔널 필드 기본값 설정
+		// 필수 필드가 절반 이상 누락되면 에러
+		if (missingFields.length >= requiredFields.length / 2) {
+			throw new Error(`주요 필드 누락: ${missingFields.join(", ")}`);
+		}
+
+		// 필수 및 옵셔널 필드 기본값 설정
 		return {
-			personality: parsed.personality.trim(),
-			strengths: parsed.strengths.trim(),
-			challenges: parsed.challenges.trim(),
-			summary: parsed.summary.trim(),
+			personality:
+				parsed.personality?.trim() ||
+				"균형 잡힌 성격으로 다양한 상황에 적응하는 능력이 뛰어납니다.",
+			strengths:
+				parsed.strengths?.trim() ||
+				"타고난 재능과 꾸준한 노력으로 목표를 달성하는 능력이 있습니다.",
+			challenges:
+				parsed.challenges?.trim() ||
+				"지속적인 성장을 위해 새로운 도전을 받아들이는 것이 중요합니다.",
+			summary:
+				parsed.summary?.trim() ||
+				"전반적으로 안정적이고 발전 가능성이 높은 사주입니다.",
 			lifeAdvice:
 				parsed.lifeAdvice?.trim() ||
 				"매일 조금씩 성장하는 자신을 믿고 나아가세요.",

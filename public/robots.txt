@@ -1,0 +1,43 @@
+# 개-사주 - AI 사주 해석 서비스
+User-agent: *
+Allow: /
+
+# 중요 페이지 우선순위
+Allow: /input
+Allow: /result
+Allow: /share
+
+# 제외할 페이지/디렉토리
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+Disallow: /test/
+
+# 사이트맵 위치
+Sitemap: https://gary-saju-service.vercel.app/sitemap.xml
+
+# 크롤링 속도 제한 (서버 부하 방지)
+Crawl-delay: 1
+
+# 특정 봇 허용
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: NaverBot
+Allow: /
+
+User-agent: Yeti
+Allow: /
+
+# 광고/스팸 봇 차단
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /

@@ -86,21 +86,44 @@ export function extractShareData(
 }
 
 /**
- * 공유용 URL 생성
+ * 동적 공유 페이지 URL 생성
  */
 export function generateShareUrl(
 	shareData: ReturnType<typeof extractShareData>,
 	baseUrl: string = ""
 ) {
+	// 고유 ID 생성 (실제로는 데이터베이스 ID를 사용)
+	const shareId = generateShareId(shareData);
+
 	const params = new URLSearchParams({
 		name: shareData.name,
 		element: shareData.dominantElement,
 		keywords: shareData.keywords.join(","),
 		tone: shareData.tone,
 		birthInfo: shareData.birthInfo,
+		summary: shareData.summary,
 	});
 
-	return `${baseUrl}/api/og?${params.toString()}`;
+	return `${baseUrl}/share/${shareId}?${params.toString()}`;
+}
+
+/**
+ * 공유 ID 생성 (간단한 해시 기반)
+ */
+function generateShareId(
+	shareData: ReturnType<typeof extractShareData>
+): string {
+	const dataString = `${shareData.name}-${shareData.dominantElement}-${shareData.birthInfo}`;
+
+	// 간단한 해시 함수 (실제로는 더 복잡한 로직 필요)
+	let hash = 0;
+	for (let i = 0; i < dataString.length; i++) {
+		const char = dataString.charCodeAt(i);
+		hash = (hash << 5) - hash + char;
+		hash = hash & hash; // 32bit 정수로 변환
+	}
+
+	return Math.abs(hash).toString(36).substring(0, 8);
 }
 
 /**
@@ -259,5 +282,165 @@ export function addUTMParameters(
 	urlObj.searchParams.set("utm_medium", medium);
 	urlObj.searchParams.set("utm_campaign", campaign);
 	urlObj.searchParams.set("utm_content", "saju_card");
+	urlObj.searchParams.set("utm_term", `${Date.now()}`); // 타임스탬프 추가
 	return urlObj.toString();
+}
+
+/**
+ * 🌟 공유 이벤트 트래킹 (Vercel Analytics 연동)
+ */
+export function trackShareEvent(
+	platform: string,
+	shareData: ReturnType<typeof extractShareData>,
+	userId?: string
+) {
+	try {
+		// Vercel Analytics 이벤트 트래킹
+		if (typeof window !== "undefined" && (window as any).va) {
+			(window as any).va("track", "share", {
+				platform,
+				element: shareData.dominantElement,
+				user_name: shareData.name,
+				keywords: shareData.keywords.join(","),
+				birth_info: shareData.birthInfo,
+				tone: shareData.tone,
+				user_id: userId,
+				timestamp: new Date().toISOString(),
+			});
+		}
+
+		// 로컬 스토리지에 공유 기록 저장
+		const shareHistory = getShareHistory();
+		const newShare = {
+			id: generateShareId(shareData),
+			platform,
+			timestamp: Date.now(),
+			data: shareData,
+		};
+
+		shareHistory.push(newShare);
+
+		// 최근 10개만 유지
+		if (shareHistory.length > 10) {
+			shareHistory.splice(0, shareHistory.length - 10);
+		}
+
+		localStorage.setItem("saju_share_history", JSON.stringify(shareHistory));
+
+		console.log(
+			`📊 공유 트래킹: ${platform}로 ${shareData.name}님의 ${shareData.dominantElement} 사주 공유`
+		);
+	} catch (error) {
+		console.error("공유 트래킹 실패:", error);
+	}
+}
+
+/**
+ * 공유 기록 조회
+ */
+export function getShareHistory(): Array<{
+	id: string;
+	platform: string;
+	timestamp: number;
+	data: ReturnType<typeof extractShareData>;
+}> {
+	try {
+		if (typeof window === "undefined") return [];
+
+		const history = localStorage.getItem("saju_share_history");
+		return history ? JSON.parse(history) : [];
+	} catch (error) {
+		console.error("공유 기록 조회 실패:", error);
+		return [];
+	}
+}
+
+/**
+ * 인기 공유 통계 분석
+ */
+export function getShareStats() {
+	const history = getShareHistory();
+
+	// 플랫폼별 공유 수
+	const platformStats = history.reduce((acc, share) => {
+		acc[share.platform] = (acc[share.platform] || 0) + 1;
+		return acc;
+	}, {} as Record<string, number>);
+
+	// 오행별 공유 수
+	const elementStats = history.reduce((acc, share) => {
+		const element = share.data.dominantElement;
+		acc[element] = (acc[element] || 0) + 1;
+		return acc;
+	}, {} as Record<string, number>);
+
+	// 최근 7일 공유 수
+	const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+	const recentShares = history.filter((share) => share.timestamp > weekAgo);
+
+	return {
+		total: history.length,
+		platforms: platformStats,
+		elements: elementStats,
+		recentCount: recentShares.length,
+		lastShare: history[history.length - 1]?.timestamp || null,
+	};
+}
+
+/**
+ * 🌟 A/B 테스트용 공유 버전 선택
+ */
+export function getShareVariant(): "classic" | "modern" | "traditional" {
+	// 간단한 A/B 테스트 로직 (실제로는 더 정교한 시스템 필요)
+	const variants = ["classic", "modern", "traditional"] as const;
+	const hash = Math.abs(Date.now() % 3);
+	return variants[hash];
+}
+
+/**
+ * 🌟 공유 성과 분석 리포트 생성
+ */
+export function generateShareReport() {
+	const stats = getShareStats();
+	const history = getShareHistory();
+
+	// 가장 인기 있는 플랫폼
+	const topPlatform =
+		Object.entries(stats.platforms).sort(([, a], [, b]) => b - a)[0]?.[0] ||
+		"unknown";
+
+	// 가장 많이 공유된 오행
+	const topElement =
+		Object.entries(stats.elements).sort(([, a], [, b]) => b - a)[0]?.[0] ||
+		"unknown";
+
+	// 평균 공유 간격 (일)
+	const avgInterval =
+		history.length > 1
+			? (Date.now() - history[0].timestamp) /
+			  (history.length - 1) /
+			  (24 * 60 * 60 * 1000)
+			: 0;
+
+	return {
+		summary: {
+			totalShares: stats.total,
+			recentShares: stats.recentCount,
+			topPlatform,
+			topElement,
+			avgIntervalDays: Math.round(avgInterval * 10) / 10,
+		},
+		recommendations: [
+			stats.recentCount === 0
+				? "최근 공유가 없습니다. SNS 활동을 늘려보세요!"
+				: null,
+			topPlatform === "kakao"
+				? "카카오톡 공유가 인기입니다. 카카오 최적화를 강화하세요."
+				: null,
+			stats.total < 5
+				? "공유 기능을 더 활용해보세요. 친구들과 사주를 나눠보세요!"
+				: null,
+		].filter(Boolean),
+		details: stats,
+	};
 }

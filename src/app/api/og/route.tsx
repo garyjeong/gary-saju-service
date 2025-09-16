@@ -1,39 +1,35 @@
 /**
  * 개-사주 동적 OG 이미지 생성 API
- * 사주 결과를 기반으로 공유용 이미지를 동적으로 생성
+ * Next.js ImageResponse를 사용한 SNS 공유용 이미지 자동 생성
  */
 
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 
-export const runtime = 'edge';
+// 오행별 색상 설정 (전통 한국 테마)
+const elementColors = {
+  목: { primary: '#2D5016', secondary: '#8FBC8F', bg: '#F0FFF0', emoji: '🌳' },
+  화: { primary: '#D2691E', secondary: '#FF6347', bg: '#FFF8DC', emoji: '🔥' },
+  토: { primary: '#8B4513', secondary: '#DEB887', bg: '#FDF5E6', emoji: '🏔️' },
+  금: { primary: '#708090', secondary: '#C0C0C0', bg: '#F8F8FF', emoji: '⚔️' },
+  수: { primary: '#191970', secondary: '#4169E1', bg: '#F0F8FF', emoji: '🌊' },
+  미지: { primary: '#696969', secondary: '#A9A9A9', bg: '#F5F5F5', emoji: '✨' }
+} as const;
 
-/**
- * OG 이미지 생성 API
- * URL: /api/og?name=홍길동&element=화&keywords=창의적,열정적&tone=casual
- */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     
-    // URL 파라미터 추출
+    // URL 파라미터에서 사주 정보 추출
     const name = searchParams.get('name') || '익명';
     const element = searchParams.get('element') || '미지';
-    const keywords = searchParams.get('keywords')?.split(',') || ['신비로운'];
+    const keywords = searchParams.get('keywords')?.split(',') || ['신비로운', '독특한', '특별한'];
+    const birthInfo = searchParams.get('birthInfo') || '';
     const tone = searchParams.get('tone') || 'casual';
-    const birthInfo = searchParams.get('birthInfo') || '1990년생';
+    const summary = searchParams.get('summary') || '나만의 특별한 사주';
 
-    // 오행별 색상 및 이모지
-    const elementConfig: Record<string, { color: string; bgColor: string; emoji: string }> = {
-      '목': { color: '#059669', bgColor: '#dcfce7', emoji: '🌳' },
-      '화': { color: '#dc2626', bgColor: '#fef2f2', emoji: '🔥' },
-      '토': { color: '#d97706', bgColor: '#fefbeb', emoji: '🏔️' },
-      '금': { color: '#7c2d12', bgColor: '#fef7ed', emoji: '⚔️' },
-      '수': { color: '#1d4ed8', bgColor: '#eff6ff', emoji: '🌊' },
-      '미지': { color: '#6b7280', bgColor: '#f9fafb', emoji: '✨' },
-    };
-
-    const config = elementConfig[element] || elementConfig['미지'];
+    // 해당 오행의 색상 테마 적용
+    const colors = elementColors[element as keyof typeof elementColors] || elementColors['미지'];
 
     return new ImageResponse(
       (
@@ -45,12 +41,24 @@ export async function GET(request: NextRequest) {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            background: `linear-gradient(135deg, ${config.bgColor} 0%, #ffffff 50%, ${config.bgColor} 100%)`,
-            fontFamily: 'system-ui',
+            backgroundColor: colors.bg,
+            fontFamily: 'system-ui, sans-serif',
             position: 'relative',
           }}
         >
-          {/* 배경 패턴 */}
+          {/* 배경 그라디언트 */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: `linear-gradient(135deg, ${colors.bg} 0%, ${colors.secondary}20 100%)`,
+            }}
+          />
+
+          {/* 전통 패턴 배경 */}
           <div
             style={{
               position: 'absolute',
@@ -59,29 +67,21 @@ export async function GET(request: NextRequest) {
               right: 0,
               bottom: 0,
               opacity: 0.1,
-              background: `radial-gradient(circle at 20% 80%, ${config.color} 0%, transparent 50%),
-                          radial-gradient(circle at 80% 20%, ${config.color} 0%, transparent 50%),
-                          radial-gradient(circle at 40% 40%, ${config.color} 0%, transparent 50%)`,
+              backgroundImage: `radial-gradient(circle at 25% 25%, ${colors.primary} 0%, transparent 50%), radial-gradient(circle at 75% 75%, ${colors.secondary} 0%, transparent 50%)`,
             }}
           />
 
-          {/* 메인 카드 */}
+          {/* 메인 콘텐츠 */}
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '60px',
-              borderRadius: '32px',
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(10px)',
-              border: `2px solid ${config.color}20`,
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-              maxWidth: '800px',
-              width: '90%',
               textAlign: 'center',
-              position: 'relative',
+              zIndex: 10,
+              maxWidth: '900px',
+              padding: '80px',
             }}
           >
             {/* 브랜드 로고 */}
@@ -89,104 +89,117 @@ export async function GET(request: NextRequest) {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '16px',
-                marginBottom: '40px',
+                gap: '20px',
+                marginBottom: '60px',
               }}
             >
               <div
                 style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '16px',
-                  background: `linear-gradient(135deg, ${config.color}, #6366f1)`,
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '20px',
+                  background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '24px',
+                  fontSize: '40px',
+                  boxShadow: `0 20px 40px ${colors.primary}40`,
                 }}
               >
                 ✨
               </div>
-              <div
+              <h1
                 style={{
-                  fontSize: '32px',
+                  fontSize: '64px',
                   fontWeight: 'bold',
-                  background: `linear-gradient(135deg, ${config.color}, #6366f1)`,
+                  background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 100%)`,
                   backgroundClip: 'text',
                   color: 'transparent',
+                  margin: 0,
                 }}
               >
                 개-사주
-              </div>
+              </h1>
             </div>
 
-            {/* 이름과 정보 */}
-            <div
-              style={{
-                fontSize: '48px',
-                fontWeight: 'bold',
-                color: '#1f2937',
-                marginBottom: '16px',
-              }}
-            >
-              {name}님의 사주
-            </div>
-
-            <div
-              style={{
-                fontSize: '20px',
-                color: '#6b7280',
-                marginBottom: '40px',
-              }}
-            >
-              {birthInfo} • AI 개인화 해석
-            </div>
-
-            {/* 주요 오행 */}
+            {/* 이름과 오행 */}
             <div
               style={{
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
-                gap: '16px',
-                marginBottom: '32px',
-                padding: '20px 32px',
-                borderRadius: '24px',
-                background: config.bgColor,
-                border: `2px solid ${config.color}30`,
+                gap: '30px',
+                marginBottom: '50px',
               }}
             >
-              <div style={{ fontSize: '32px' }}>{config.emoji}</div>
-              <div
+              <h2
                 style={{
-                  fontSize: '28px',
+                  fontSize: '72px',
                   fontWeight: 'bold',
-                  color: config.color,
+                  color: colors.primary,
+                  margin: 0,
+                  textShadow: `2px 2px 4px ${colors.primary}20`,
                 }}
               >
-                {element} 기운 중심
+                {name}님의 사주
+              </h2>
+              
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '20px',
+                  background: 'white',
+                  padding: '20px 40px',
+                  borderRadius: '50px',
+                  boxShadow: `0 10px 30px ${colors.primary}20`,
+                  border: `3px solid ${colors.secondary}`,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: '48px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {colors.emoji}
+                </div>
+                <span
+                  style={{
+                    fontSize: '48px',
+                    fontWeight: 'bold',
+                    color: colors.primary,
+                  }}
+                >
+                  {element} 기운
+                </span>
               </div>
             </div>
 
-            {/* 키워드들 */}
+            {/* 키워드 배지들 */}
             <div
               style={{
                 display: 'flex',
+                gap: '20px',
+                marginBottom: '50px',
                 flexWrap: 'wrap',
-                gap: '12px',
                 justifyContent: 'center',
-                marginBottom: '40px',
               }}
             >
               {keywords.slice(0, 3).map((keyword, index) => (
                 <div
-                  key={index}
+                  key={keyword}
                   style={{
-                    padding: '12px 24px',
-                    borderRadius: '20px',
-                    background: `${config.color}15`,
-                    color: config.color,
-                    fontSize: '18px',
+                    background: `linear-gradient(135deg, ${colors.secondary}30 0%, ${colors.primary}20 100%)`,
+                    color: colors.primary,
+                    padding: '15px 30px',
+                    borderRadius: '25px',
+                    fontSize: '32px',
                     fontWeight: '600',
+                    border: `2px solid ${colors.secondary}50`,
+                    boxShadow: `0 8px 20px ${colors.primary}15`,
                   }}
                 >
                   {keyword}
@@ -194,48 +207,110 @@ export async function GET(request: NextRequest) {
               ))}
             </div>
 
-            {/* 톤별 메시지 */}
+            {/* 요약 */}
+            {summary && (
+              <div
+                style={{
+                  background: 'white',
+                  padding: '30px 50px',
+                  borderRadius: '20px',
+                  fontSize: '28px',
+                  color: colors.primary,
+                  fontStyle: 'italic',
+                  maxWidth: '700px',
+                  textAlign: 'center',
+                  boxShadow: `0 15px 35px ${colors.primary}20`,
+                  border: `2px solid ${colors.secondary}30`,
+                  marginBottom: '40px',
+                }}
+              >
+                "{summary}"
+              </div>
+            )}
+
+            {/* 출생 정보 */}
+            {birthInfo && (
+              <div
+                style={{
+                  background: `${colors.primary}10`,
+                  color: colors.primary,
+                  padding: '15px 30px',
+                  borderRadius: '15px',
+                  fontSize: '24px',
+                  fontFamily: 'monospace',
+                  marginBottom: '30px',
+                }}
+              >
+                {birthInfo}
+              </div>
+            )}
+
+            {/* 푸터 */}
             <div
               style={{
-                fontSize: '18px',
-                color: '#4b5563',
-                fontStyle: 'italic',
-                lineHeight: '1.6',
-                maxWidth: '600px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                fontSize: '24px',
+                color: colors.secondary,
+                opacity: 0.8,
               }}
             >
-              {tone === 'casual' && "친근하고 편안한 AI 해석으로 나의 운명을 알아보세요 😊"}
-              {tone === 'formal' && "정통 사주명리학을 바탕으로 한 전문적인 해석을 제공합니다"}
-              {tone === 'poetic' && "아름다운 문체로 펼쳐지는 나만의 운명 이야기를 만나보세요 🌸"}
+              ✨ AI가 풀어주는 나만의 사주 해석 ✨
             </div>
           </div>
 
-          {/* 하단 CTA */}
+          {/* 장식 요소들 */}
           <div
             style={{
-              marginTop: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              fontSize: '16px',
-              color: '#6b7280',
+              position: 'absolute',
+              top: '50px',
+              left: '50px',
+              width: '100px',
+              height: '100px',
+              borderRadius: '50%',
+              background: `${colors.secondary}30`,
+              opacity: 0.6,
             }}
-          >
-            <div style={{ fontSize: '20px' }}>✨</div>
-            <span>gae-saju.vercel.app에서 무료로 확인해보세요</span>
-            <div style={{ fontSize: '20px' }}>✨</div>
-          </div>
+          />
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '80px',
+              right: '80px',
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              background: `${colors.primary}20`,
+              opacity: 0.5,
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              top: '150px',
+              right: '120px',
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              background: `${colors.secondary}40`,
+              opacity: 0.4,
+            }}
+          />
         </div>
       ),
       {
         width: 1200,
         height: 630,
-      },
+        headers: {
+          'Cache-Control': 'public, max-age=31536000, immutable',
+        },
+      }
     );
   } catch (error) {
     console.error('OG 이미지 생성 실패:', error);
     
-    // 폴백 이미지 응답
+    // 에러 시 기본 이미지 반환
     return new ImageResponse(
       (
         <div
@@ -246,34 +321,34 @@ export async function GET(request: NextRequest) {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'linear-gradient(135deg, #f3e8ff, #ffffff)',
-            fontFamily: 'system-ui',
+            backgroundColor: '#FDF6E3',
+            fontFamily: 'system-ui, sans-serif',
           }}
         >
           <div
             style={{
-              fontSize: '48px',
+              fontSize: '72px',
               fontWeight: 'bold',
-              color: '#7c3aed',
-              marginBottom: '20px',
+              color: '#8B4513',
+              marginBottom: '40px',
             }}
           >
             개-사주
           </div>
           <div
             style={{
-              fontSize: '24px',
-              color: '#6b7280',
+              fontSize: '48px',
+              color: '#D2691E',
             }}
           >
-            AI가 해석하는 나만의 사주
+            AI가 풀어주는 사주 해석
           </div>
         </div>
       ),
       {
         width: 1200,
         height: 630,
-      },
+      }
     );
   }
 }

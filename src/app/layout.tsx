@@ -2,9 +2,6 @@ import type { Metadata } from 'next';
 import { Noto_Sans_KR, Noto_Serif_KR, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import Providers from './providers';
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/next';
-import AnalyticsProvider from './analytics-provider';
 
 // Primary Font: 한글 가독성이 우수한 Noto Sans KR
 const notoSansKR = Noto_Sans_KR({
@@ -18,7 +15,7 @@ const notoSansKR = Noto_Sans_KR({
 const notoSerifKR = Noto_Serif_KR({
   variable: '--font-noto-serif-kr',
   subsets: ['latin'],
-  weight: ['400', '500', '700'],
+  weight: ['200', '300', '400', '500', '600', '700', '900'],
   display: 'swap',
 });
 
@@ -30,27 +27,27 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: '개-사주 - 현대적 감성의 사주 풀이',
-  description: '전통 사주를 현대적이고 감성적인 UI로 쉽고 재미있게 체험하며, SNS로 공유할 수 있는 웹 서비스',
+  title: {
+    default: '개-사주 - AI가 풀어주는 나만의 사주 해석',
+    template: '%s | 개-사주'
+  },
+  description: '전통 사주를 AI가 개인화하여 현대적이고 감성적으로 해석해주는 무료 사주 서비스. 생년월일과 시간만으로 나만의 운명을 알아보세요.',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html suppressHydrationWarning>
+    <html lang="ko">
       <body
         className={`${notoSansKR.variable} ${notoSerifKR.variable} ${geistMono.variable} font-sans antialiased`}
       >
         <Providers>
           {children}
-          <AnalyticsProvider />
         </Providers>
-        <Analytics />
-        <SpeedInsights />
       </body>
     </html>
-  );
+  )
 }

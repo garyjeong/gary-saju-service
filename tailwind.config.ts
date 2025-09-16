@@ -70,21 +70,61 @@ const config = {
 					DEFAULT: "hsl(var(--card))",
 					foreground: "hsl(var(--card-foreground))",
 				},
-				// 사주 서비스 전용 오행 색상
-				element: {
-					wood: "hsl(120, 40%, 35%)", // 목(木) - 녹색
-					fire: "hsl(0, 70%, 50%)", // 화(火) - 적색
-					earth: "hsl(28, 60%, 55%)", // 토(土) - 황토색
-					metal: "hsl(50, 30%, 85%)", // 금(金) - 백금색
-					water: "hsl(200, 50%, 40%)", // 수(水) - 청색
+				// 🌟 한국 전통 오방색(五方色) 기반 색상 시스템
+				korea: {
+					// 청색 (東 - 동쪽, 목, 봄)
+					blue: "#003f7f", // 진청색 (궁궐 청색)
+					"blue-50": "#e8f2ff",
+					"blue-100": "#d1e6ff",
+					"blue-500": "#1a5fb8",
+					"blue-900": "#002952",
+
+					// 백색 (中 - 중앙, 토, 늦여름)
+					white: "#fefefe", // 한지 백색
+					"white-50": "#fafafa",
+					"white-100": "#f5f5f5",
+					"white-500": "#e5e5e5",
+					"white-900": "#a3a3a3",
+
+					// 적색 (南 - 남쪽, 화, 여름)
+					red: "#d73502", // 주홍색 (단청 주색)
+					"red-50": "#fff2f0",
+					"red-100": "#ffe5e0",
+					"red-500": "#e8481d",
+					"red-900": "#a32c01",
+
+					// 흑색 (北 - 북쪽, 수, 겨울)
+					black: "#1c1c1c", // 먹색
+					"black-50": "#f9f9f9",
+					"black-100": "#f0f0f0",
+					"black-500": "#666666",
+					"black-900": "#0a0a0a",
+
+					// 황색 (西 - 서쪽, 금, 가을)
+					yellow: "#f4b942", // 황금색 (단청 황색)
+					"yellow-50": "#fffcf5",
+					"yellow-100": "#fff8eb",
+					"yellow-500": "#f59e0b",
+					"yellow-900": "#b45309",
 				},
-				// 차트 및 시각화용 색상 팔레트
+
+				// 🌟 자연 기반 보조 색상
+				nature: {
+					mountain: "#4a5d23", // 산색 (깊은 녹색)
+					sky: "#87ceeb", // 하늘색
+					earth: "#8b4513", // 흙색
+					stone: "#708090", // 돌색
+					bamboo: "#228b22", // 대나무색
+					pine: "#2d5016", // 소나무색
+				},
+
+				// 🌟 오행 기반 차트 색상 (한국 전통 색상 적용)
 				chart: {
-					1: "hsl(28, 60%, 55%)", // 토(土)
-					2: "hsl(200, 50%, 40%)", // 수(水)
-					3: "hsl(120, 40%, 35%)", // 목(木)
-					4: "hsl(0, 70%, 50%)", // 화(火)
-					5: "hsl(50, 30%, 85%)", // 금(金)
+					1: "#f4b942", // 황(金) - 황금색
+					2: "#003f7f", // 청(水) - 진청색
+					3: "#4a5d23", // 청목(木) - 산색
+					4: "#d73502", // 주(火) - 주홍색
+					5: "#8b4513", // 갈(土) - 흙색
 				},
 			},
 			borderRadius: {
@@ -124,6 +164,63 @@ const config = {
 					"0%, 100%": { transform: "translateY(0px)" },
 					"50%": { transform: "translateY(-20px)" },
 				},
+				// 🌟 사주 전용 신비로운 애니메이션
+				"yin-yang": {
+					"0%": { transform: "rotate(0deg)" },
+					"100%": { transform: "rotate(360deg)" },
+				},
+				"cosmic-float": {
+					"0%, 100%": {
+						transform: "translateY(0px) translateX(0px) scale(1)",
+						opacity: "0.7",
+					},
+					"33%": {
+						transform: "translateY(-30px) translateX(20px) scale(1.1)",
+						opacity: "1",
+					},
+					"66%": {
+						transform: "translateY(-10px) translateX(-15px) scale(0.9)",
+						opacity: "0.8",
+					},
+				},
+				"star-twinkle": {
+					"0%, 100%": { opacity: "0.3", transform: "scale(0.8)" },
+					"50%": { opacity: "1", transform: "scale(1.2)" },
+				},
+				"mystic-glow": {
+					"0%, 100%": {
+						boxShadow: "0 0 20px rgba(45, 80, 22, 0.3)",
+						filter: "brightness(1)",
+					},
+					"50%": {
+						boxShadow: "0 0 40px rgba(45, 80, 22, 0.6)",
+						filter: "brightness(1.2)",
+					},
+				},
+				"ink-spread": {
+					"0%": {
+						transform: "scale(0.8)",
+						opacity: "0",
+						filter: "blur(5px)",
+					},
+					"50%": {
+						transform: "scale(1.05)",
+						opacity: "0.8",
+						filter: "blur(1px)",
+					},
+					"100%": {
+						transform: "scale(1)",
+						opacity: "1",
+						filter: "blur(0px)",
+					},
+				},
+				"element-flow": {
+					"0%": { transform: "translateX(-100%) rotate(0deg)" },
+					"25%": { transform: "translateX(-50%) rotate(90deg)" },
+					"50%": { transform: "translateX(0%) rotate(180deg)" },
+					"75%": { transform: "translateX(50%) rotate(270deg)" },
+					"100%": { transform: "translateX(100%) rotate(360deg)" },
+				},
 			},
 			animation: {
 				"accordion-down": "accordion-down 0.2s ease-out",
@@ -131,6 +228,13 @@ const config = {
 				"fade-in": "fade-in 0.6s ease-out",
 				"slide-in": "slide-in 0.3s ease-out",
 				floating: "floating 3s ease-in-out infinite",
+				// 🌟 사주 전용 애니메이션
+				"yin-yang": "yin-yang 8s linear infinite",
+				"cosmic-float": "cosmic-float 6s ease-in-out infinite",
+				"star-twinkle": "star-twinkle 2s ease-in-out infinite",
+				"mystic-glow": "mystic-glow 3s ease-in-out infinite",
+				"ink-spread": "ink-spread 1s ease-out forwards",
+				"element-flow": "element-flow 12s linear infinite",
 			},
 		},
 	},

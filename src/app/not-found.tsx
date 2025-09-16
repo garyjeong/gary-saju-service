@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { Home, ArrowLeft, Sparkles, Search, AlertCircle } from "lucide-react";
+import { ArrowLeft, Sparkles, Search, AlertCircle } from "lucide-react";
 import Link from "next/link";
 
 export default function NotFound() {
@@ -50,28 +50,6 @@ export default function NotFound() {
 
 					{/* 추천 액션 카드들 */}
 					<div className="grid md:grid-cols-3 gap-8 mb-16">
-						<Card className="glass-card border-none group hover:scale-105 transition-all duration-300">
-							<CardContent className="p-8 text-center space-y-6">
-								<div className="relative">
-									<div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
-										<Home className="w-8 h-8 text-primary" />
-									</div>
-									<div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
-								</div>
-								<div className="space-y-3">
-									<h3 className="text-xl font-serif font-medium text-foreground">홈으로 돌아가기</h3>
-									<p className="text-sm text-muted-foreground">
-										메인 페이지에서 개-사주의 모든 기능을 확인해보세요
-									</p>
-								</div>
-								<Button asChild size="lg" className="w-full gradient-button text-white">
-									<Link href="/">
-										<Home className="w-4 h-4 mr-2" />
-										홈으로 가기
-									</Link>
-								</Button>
-							</CardContent>
-						</Card>
 
 						<Card className="glass-card border-none group hover:scale-105 transition-all duration-300">
 							<CardContent className="p-8 text-center space-y-6">
@@ -96,42 +74,14 @@ export default function NotFound() {
 							</CardContent>
 						</Card>
 
-						<Card className="glass-card border-none group hover:scale-105 transition-all duration-300">
-							<CardContent className="p-8 text-center space-y-6">
-								<div className="relative">
-									<div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
-										<Search className="w-8 h-8 text-primary" />
-									</div>
-									<div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
-								</div>
-								<div className="space-y-3">
-									<h3 className="text-xl font-serif font-medium text-foreground">결과 예시</h3>
-									<p className="text-sm text-muted-foreground">
-										샘플 사주 결과를 먼저 확인해보세요
-									</p>
-								</div>
-								<Button asChild variant="outline" size="lg" className="w-full modern-card">
-									<Link href="/result">
-										<Search className="w-4 h-4 mr-2" />
-										예시 보기
-									</Link>
-								</Button>
-							</CardContent>
-						</Card>
 					</div>
 
 					{/* 네비게이션 */}
-					<div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+					<div className="flex justify-center">
 						<Button asChild variant="ghost" size="lg" className="px-6 py-3 rounded-xl group">
 							<Link href="javascript:history.back()" className="flex items-center gap-2">
 								<ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
 								이전 페이지로
-							</Link>
-						</Button>
-						<Button asChild variant="ghost" size="lg" className="px-6 py-3 rounded-xl group hover:bg-primary/10">
-							<Link href="/" className="flex items-center gap-2">
-								홈으로 돌아가기
-								<Home className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
 							</Link>
 						</Button>
 					</div>

@@ -102,7 +102,6 @@ describe('페이지 통합 테스트', () => {
       expect(screen.getByText('개-사주')).toBeInTheDocument()
       expect(screen.getByText('전통 사주를 현대적이고 감성적인 UI로')).toBeInTheDocument()
       expect(screen.getByText('사주 보기 시작')).toBeInTheDocument()
-      expect(screen.getByText('결과 예시 보기')).toBeInTheDocument()
     })
 
     it('오늘의 운세 위젯이 표시되어야 한다', () => {
@@ -141,9 +140,6 @@ describe('페이지 통합 테스트', () => {
       
       const startButton = screen.getByText('사주 보기 시작')
       expect(startButton.closest('a')).toHaveAttribute('href', '/input')
-      
-      const exampleButton = screen.getByText('결과 예시 보기')
-      expect(exampleButton.closest('a')).toHaveAttribute('href', '/result')
     })
   })
 

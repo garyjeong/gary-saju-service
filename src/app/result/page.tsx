@@ -2,21 +2,23 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { trackSajuEvent, trackUserBehavior, PagePerformanceTracker } from "@/lib/analytics/vercel-analytics";
 import { Button } from "@/components/ui/button";
 import { SajuResultSkeleton } from "@/components/ui/enhanced-loading";
 import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import PageTransition, { FadeInSection, StaggerContainer, StaggerItem } from "@/components/ui/page-transition";
+import { FloatingThemeToggle } from "@/components/ui/theme-toggle";
 import TabNavigation from "@/components/saju/TabNavigation";
 import SajuCard, { ElementBadge } from "@/components/saju/SajuCard";
 import ElementChart from "@/components/saju/ElementChart";
 import LuckTimeline from "@/components/saju/LuckTimeline";
+import RealtimeFortuneWidget from "@/components/saju/RealtimeFortuneWidget";
 import { DUMMY_SAJU_RESULT } from "@/data/dummy";
 import { SajuResult } from "@/lib/saju/types";
 import { SajuInputType } from "@/lib/saju/validation";
 import { useAIInterpretation, UserProfile } from "@/hooks/useAIInterpretation";
-import UserProfileModal from "@/components/saju/UserProfileModal";
-import { Share2, ArrowLeft, Download, Loader2, Smartphone, Sparkles, Settings } from "lucide-react";
+import { Share2, ArrowLeft, Download, Loader2, Smartphone, Sparkles, Stars, Zap } from "lucide-react";
 import { AIStageLoading } from "@/components/ui/ai-loading";
 import { AIServiceError } from "@/components/ui/enhanced-error";
 import { cn } from "@/lib/utils";
@@ -28,6 +30,58 @@ const tabs = [
 	{ id: "timeline", label: "운세 흐름", description: "시기별 운세" },
 ];
 
+// 🌟 애니메이션 설정
+const cardRevealVariants = {
+	hidden: { 
+		opacity: 0, 
+		y: 50, 
+		rotateY: -15,
+		scale: 0.9 
+	},
+	visible: (index: number) => ({
+		opacity: 1,
+		y: 0,
+		rotateY: 0,
+		scale: 1,
+		transition: {
+			delay: index * 0.3,
+			duration: 0.6,
+			type: "spring",
+			stiffness: 100,
+			damping: 12
+		}
+	})
+};
+
+const staggeredContainerVariants = {
+	hidden: { opacity: 0 },
+	visible: {
+		opacity: 1,
+		transition: {
+			staggerChildren: 0.2,
+			delayChildren: 0.3
+		}
+	}
+};
+
+const mysticalGlowVariants = {
+	initial: { 
+		boxShadow: "0 0 20px rgba(45, 80, 22, 0.3)" 
+	},
+	animate: { 
+		boxShadow: [
+			"0 0 20px rgba(45, 80, 22, 0.3)",
+			"0 0 40px rgba(45, 80, 22, 0.6)",
+			"0 0 20px rgba(45, 80, 22, 0.3)"
+		],
+		transition: {
+			duration: 3,
+			repeat: Infinity,
+			ease: "easeInOut"
+		}
+	}
+};
+
 export default function ResultPage() {
 	const router = useRouter();
 	const [activeTab, setActiveTab] = useState("basic");
@@ -35,12 +89,27 @@ export default function ResultPage() {
 	const [sajuInput, setSajuInput] = useState<SajuInputType | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isMobile, setIsMobile] = useState(false);
-	const [showProfileModal, setShowProfileModal] = useState(false);
-	const [currentProfile, setCurrentProfile] = useState<UserProfile>({
-		tone: 'casual',
-		interests: ['career', 'love']
-	});
 	const [aiStage, setAiStage] = useState<"analyzing" | "enhancing" | "personalizing" | "finalizing">("analyzing");
+	
+	// 🌟 애니메이션 상태
+	const [showCards, setShowCards] = useState(false);
+	const [revealedCards, setRevealedCards] = useState<boolean[]>([false, false, false, false]);
+	const controls = useAnimation();
+	
+	// 🌟 카드 순차 공개 함수
+	const startCardRevealSequence = () => {
+		const pillars = ["년주", "월주", "일주", "시주"];
+		
+		pillars.forEach((_, index) => {
+			setTimeout(() => {
+				setRevealedCards(prev => {
+					const newRevealed = [...prev];
+					newRevealed[index] = true;
+					return newRevealed;
+				});
+			}, index * 800); // 0.8초 간격으로 순차 공개
+		});
+	};
 	
 	// AI 해석 훅
 	const { 
@@ -76,27 +145,38 @@ export default function ResultPage() {
 				setSajuResult(result);
 				setSajuInput(input);
 				
-				// 기본 프로필 설정
-				const defaultProfile: UserProfile = {
-					age: input.birthDate ? new Date().getFullYear() - new Date(input.birthDate).getFullYear() : undefined,
-					gender: input.gender,
-					tone: 'casual',
-					interests: ['career', 'love']
-				};
-				setCurrentProfile(defaultProfile);
-
-				// AI 해석 자동 실행 (기본 프로필로)
+				// AI 해석 자동 실행 (사용자 설정 프로필로)
 				if (result && !isEnhanced) {
-					enhanceInterpretation(result, defaultProfile)
-						.then((aiResult) => {
-							// AI 해석 결과를 세션 스토리지에 저장 (공유용)
-							if (aiResult) {
-								sessionStorage.setItem("aiInterpretation", JSON.stringify(aiResult));
-							}
-						})
-						.catch(error => {
-							console.log('AI 해석 실패 (기본 해석 사용):', error);
-						});
+					try {
+						// 사용자가 설정한 AI 프로필 가져오기
+						const aiProfileData = sessionStorage.getItem("aiProfile");
+						let userProfile: UserProfile;
+						
+						if (aiProfileData) {
+							userProfile = JSON.parse(aiProfileData);
+						} else {
+							// 백업용 기본 프로필
+							userProfile = {
+								age: input.birthYear ? new Date().getFullYear() - parseInt(input.birthYear) : undefined,
+								gender: input.gender,
+								tone: 'casual',
+								interests: ['career', 'love']
+							};
+						}
+						
+						enhanceInterpretation(result, userProfile)
+							.then((aiResult) => {
+								// AI 해석 결과를 세션 스토리지에 저장 (공유용)
+								if (aiResult) {
+									sessionStorage.setItem("aiInterpretation", JSON.stringify(aiResult));
+								}
+							})
+							.catch(error => {
+								console.log('AI 해석 실패 (기본 해석 사용):', error);
+							});
+					} catch (error) {
+						console.error('AI 프로필 로드 오류:', error);
+					}
 				}
 			} else {
 				// 데이터가 없으면 입력 페이지로 리다이렉트
@@ -109,40 +189,14 @@ export default function ResultPage() {
 			return;
 		} finally {
 			setIsLoading(false);
+			// 🌟 카드 애니메이션 시작
+			setTimeout(() => {
+				setShowCards(true);
+				startCardRevealSequence();
+			}, 500);
 		}
 	}, [router, enhanceInterpretation, isEnhanced]);
 
-	// AI 재해석 함수 (단계별 시뮬레이션 포함)
-	const handleAIReinterpretation = async (profile?: UserProfile) => {
-		if (!sajuResult) return;
-		
-		const profileToUse = profile || currentProfile;
-		setCurrentProfile(profileToUse);
-
-		// 단계별 로딩 시뮬레이션
-		const stages: Array<"analyzing" | "enhancing" | "personalizing" | "finalizing"> = 
-			["analyzing", "enhancing", "personalizing", "finalizing"];
-		
-		let currentStageIndex = 0;
-		const stageInterval = setInterval(() => {
-			if (currentStageIndex < stages.length - 1) {
-				currentStageIndex++;
-				setAiStage(stages[currentStageIndex]);
-			}
-		}, 2000);
-
-		try {
-			const aiResult = await enhanceInterpretation(sajuResult, profileToUse);
-			// AI 해석 결과를 세션 스토리지에 저장
-			if (aiResult) {
-				sessionStorage.setItem("aiInterpretation", JSON.stringify(aiResult));
-			}
-			clearInterval(stageInterval);
-		} catch (error) {
-			clearInterval(stageInterval);
-			setAiStage("analyzing");
-		}
-	};
 
 	if (isLoading) {
 		return (
@@ -151,7 +205,6 @@ export default function ResultPage() {
 				<div className="container mx-auto px-4 py-8">
 					<SajuResultSkeleton />
 				</div>
-				<Footer />
 			</div>
 		);
 	}
@@ -183,36 +236,43 @@ export default function ResultPage() {
 	};
 
 	return (
-		<div className="min-h-screen bg-background">
-			<Header />
+		<PageTransition variant="mystical">
+			<div className="min-h-screen bg-background">
+				{/* 🌙 테마 토글 버튼 */}
+				<FloatingThemeToggle />
+				
+				<Header showBack={true} backHref="/input" title="사주 결과" />
 
-			{/* 사용자 정보 헤더 - Enhanced */}
-			<section className="relative py-12 md:py-16 overflow-hidden">
-				{/* Background Effects */}
-				<div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-accent/3 to-primary/5"></div>
-				<div className="absolute top-0 left-0 w-full h-full opacity-30">
-					<div className="absolute top-10 left-10 w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 floating delay-100 blur-sm"></div>
-					<div className="absolute top-20 right-20 w-16 h-16 rounded-full bg-gradient-to-br from-accent/20 to-primary/20 floating delay-300 blur-sm"></div>
-					<div className="absolute bottom-10 left-1/3 w-12 h-12 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 floating delay-500 blur-sm"></div>
-				</div>
+				{/* 상단 액션 버튼 영역 */}
+				<section className="pt-20 pb-4">
+					<div className="container mx-auto px-4">
+						<div className="flex justify-end">
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={() => router.push("/input")}
+								className="text-sm px-4 py-2 rounded-xl border-primary/20 hover:bg-primary/5"
+							>
+								<ArrowLeft className="w-4 h-4 mr-2" />
+								다시 입력하기
+							</Button>
+						</div>
+					</div>
+				</section>
 
-				<div className="container mx-auto px-4 relative z-10">
-					<div className="text-center space-y-8 max-w-4xl mx-auto">
-						<div className="space-y-6">
-							<div className="relative">
-								<div className="inline-flex items-center gap-4 px-8 py-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-3xl backdrop-blur-lg border border-white/10">
-									{isMobile && <Smartphone className="w-6 h-6 text-primary" />}
-									<h1 className="text-3xl md:text-5xl font-serif font-bold gradient-text">
-										{sajuInput.name}님의 사주 풀이
-									</h1>
-									{isEnhanced && (
-										<Sparkles className="w-6 h-6 text-accent animate-pulse" />
-									)}
-								</div>
-								<div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-3xl blur-xl opacity-50"></div>
-							</div>
+			{/* 사용자 정보 헤더 - 간소화됨 */}
+			<section className="py-8">
+				<div className="container mx-auto px-4">
+					<div className="text-center space-y-6 max-w-2xl mx-auto">
+						<div className="space-y-4">
+							<h1 className="text-2xl md:text-3xl font-serif font-bold text-foreground">
+								{sajuInput.name}님의 사주 풀이
+								{isEnhanced && (
+									<Sparkles className="inline-block w-5 h-5 ml-2 text-accent" />
+								)}
+							</h1>
 
-							{/* AI 해석 상태 표시 - Enhanced */}
+							{/* AI 해석 상태 표시 - 간소화됨 */}
 							{isAILoading && (
 								<div className="w-full max-w-md mx-auto">
 									<AIStageLoading currentStage={aiStage} />
@@ -220,79 +280,52 @@ export default function ResultPage() {
 							)}
 							{/* AI 해석 완료 및 에러 상태 */}
 							{!isAILoading && (
-								<div className="space-y-4">
+								<div className="space-y-3">
 									{aiError && (
 										<div className="max-w-md mx-auto">
 											<AIServiceError 
 												error={aiError}
-												onRetry={() => handleAIReinterpretation()}
+												onRetry={() => {
+													console.log("AI 해석 재시도");
+												}}
 												onFallback={() => {
-													// 에러 상태 초기화하고 기본 해석 사용
 													console.log("기본 해석으로 폴백");
 												}}
 											/>
 										</div>
 									)}
 									{isEnhanced && !aiError && (
-										<div className="flex items-center gap-4 flex-wrap justify-center">
-											<div className="inline-flex items-center gap-3 px-6 py-3 bg-accent/10 rounded-2xl backdrop-blur-sm">
-												<Sparkles className="w-5 h-5 text-accent" />
-												<span className="text-accent font-medium">AI 개인화 해석 적용됨</span>
-											</div>
-											<Button
-												variant="ghost"
-												size="sm"
-												onClick={() => setShowProfileModal(true)}
-												className="glass-card gap-2 px-4 py-2 rounded-xl hover:bg-accent/10"
-											>
-												<Settings className="w-4 h-4 text-accent" />
-												<span className="text-sm">개인화 설정</span>
-											</Button>
+										<div className="flex items-center justify-center">
+											<span className="text-accent text-sm font-medium">AI 개인화 해석</span>
 										</div>
 									)}
 								</div>
 							)}
 
-							{/* 사주 배지들 */}
-							<div className="flex flex-wrap justify-center gap-3">
-								<div className="relative group">
-									<ElementBadge
-										element={sajuResult.basic.pillars.year.earthly}
-										color="#8B4513"
-									/>
-									<div className="absolute -inset-1 bg-gradient-to-r from-orange-400/20 to-amber-400/20 rounded-lg blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-								</div>
-								<div className="relative group">
-									<ElementBadge
-										element={sajuResult.basic.pillars.month.earthly}
-										color="#228B22"
-									/>
-									<div className="absolute -inset-1 bg-gradient-to-r from-green-400/20 to-emerald-400/20 rounded-lg blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-								</div>
-								<div className="relative group">
-									<ElementBadge
-										element={sajuResult.basic.pillars.day.earthly}
-										color="#DC143C"
-									/>
-									<div className="absolute -inset-1 bg-gradient-to-r from-red-400/20 to-rose-400/20 rounded-lg blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-								</div>
-								<div className="relative group">
-									<ElementBadge
-										element={sajuResult.basic.pillars.time.earthly}
-										color="#FF6347"
-									/>
-									<div className="absolute -inset-1 bg-gradient-to-r from-orange-400/20 to-red-400/20 rounded-lg blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-								</div>
+							{/* 사주 배지들 - 간소화됨 */}
+							<div className="flex flex-wrap justify-center gap-2">
+								<ElementBadge
+									element={sajuResult.basic.pillars.year.earthly}
+									color="#8B4513"
+								/>
+								<ElementBadge
+									element={sajuResult.basic.pillars.month.earthly}
+									color="#228B22"
+								/>
+								<ElementBadge
+									element={sajuResult.basic.pillars.day.earthly}
+									color="#DC143C"
+								/>
+								<ElementBadge
+									element={sajuResult.basic.pillars.time.earthly}
+									color="#FF6347"
+								/>
 							</div>
 
-							<div className="space-y-2">
-								<p className="text-lg md:text-xl text-muted-foreground">
-									{sajuInput.birthDate} {sajuInput.birthTime} 출생
-								</p>
-								<p className="text-sm text-muted-foreground">
-									AI가 분석한 개인화 사주 해석입니다
-								</p>
-							</div>
+							{/* 출생정보 - 간소화됨 */}
+							<p className="text-muted-foreground text-sm">
+								{sajuInput.birthYear}년 {sajuInput.birthMonth}월 {sajuInput.birthDay}일 {sajuInput.birthHour}:{sajuInput.birthMinute} 출생
+							</p>
 						</div>
 					</div>
 				</div>
@@ -304,6 +337,20 @@ export default function ResultPage() {
 				activeTab={activeTab}
 				onTabChange={setActiveTab}
 			/>
+
+			{/* 🌟 실시간 운세 위젯 */}
+			<section className="py-6">
+				<div className="container mx-auto px-4">
+					<motion.div 
+						className="max-w-2xl mx-auto"
+						initial={{ opacity: 0, y: 30 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ delay: 0.5, duration: 0.6 }}
+					>
+						<RealtimeFortuneWidget />
+					</motion.div>
+				</div>
+			</section>
 
 			{/* 탭 콘텐츠 */}
 			<section className="py-8">
@@ -359,71 +406,15 @@ export default function ResultPage() {
 							</div>
 						</div>
 						
-						{/* AI 재해석 버튼들 */}
-						{!isAILoading && (
-							<div className="pt-4 space-y-3">
-								<div className="flex flex-wrap justify-center gap-3">
-									<Button
-										variant="ghost"
-										size="lg"
-										className="glass-card gap-3 px-6 py-3 rounded-xl group hover:bg-accent/10 transition-all duration-300"
-										onClick={() => setShowProfileModal(true)}
-									>
-										<Settings className="w-5 h-5 text-accent group-hover:scale-110 transition-transform duration-300" />
-										상세 설정
-									</Button>
-									<Button
-										variant="ghost"
-										size="lg"
-										className="glass-card gap-3 px-6 py-3 rounded-xl group hover:bg-accent/10 transition-all duration-300"
-										onClick={() => handleAIReinterpretation()}
-									>
-										<Sparkles className="w-5 h-5 text-accent group-hover:scale-110 transition-transform duration-300" />
-										새로고침
-									</Button>
-								</div>
-								<p className="text-xs text-muted-foreground text-center">
-									개인화 설정을 조정하여 더 정확한 해석을 받아보세요
-								</p>
-							</div>
-						)}
 					</div>
 				</div>
 			</section>
 
-			{/* 네비게이션 - Enhanced */}
-			<section className="py-8">
-				<div className="container mx-auto px-4">
-					<div className={cn(
-						"flex items-center gap-6",
-						isMobile ? "flex-col" : "justify-between"
-					)}>
-						<Button asChild variant="outline" size="lg" className="modern-card px-6 py-3 rounded-xl group">
-							<Link href="/input" className="flex items-center gap-2">
-								<ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
-								다시 입력하기
-							</Link>
-						</Button>
-						<Button asChild variant="ghost" size="lg" className="px-6 py-3 rounded-xl group hover:bg-primary/10">
-							<Link href="/" className="flex items-center gap-2">
-								홈으로 돌아가기
-								<ArrowLeft className="w-4 h-4 rotate-180 group-hover:translate-x-1 transition-transform duration-300" />
-							</Link>
-						</Button>
-					</div>
-				</div>
-			</section>
+			{/* 네비게이션 */}
 
-			<Footer />
 
-			{/* 사용자 프로필 모달 */}
-			<UserProfileModal
-				isOpen={showProfileModal}
-				onClose={() => setShowProfileModal(false)}
-				onSubmit={handleAIReinterpretation}
-				currentProfile={currentProfile}
-			/>
 		</div>
+		</PageTransition>
 	);
 }
 
@@ -438,34 +429,84 @@ function BasicInterpretation({ result }: { result: SajuResult }) {
 
 	return (
 		<div className="space-y-6 max-w-4xl mx-auto">
-			{/* 기본 사주 정보 */}
+			{/* 🌟 기본 사주 정보 - 순차 애니메이션 */}
 			<SajuCard title="사주 팔자" variant="data">
-				<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-					<div className="text-center space-y-1">
-						<p className="text-xs text-muted-foreground">년주</p>
-						<p className="font-serif font-medium text-sm md:text-base">
-							{basic.birthInfo.year}
-						</p>
-					</div>
-					<div className="text-center space-y-1">
-						<p className="text-xs text-muted-foreground">월주</p>
-						<p className="font-serif font-medium text-sm md:text-base">
-							{basic.birthInfo.month}
-						</p>
-					</div>
-					<div className="text-center space-y-1">
-						<p className="text-xs text-muted-foreground">일주</p>
-						<p className="font-serif font-medium text-sm md:text-base">
-							{basic.birthInfo.day}
-						</p>
-					</div>
-					<div className="text-center space-y-1">
-						<p className="text-xs text-muted-foreground">시주</p>
-						<p className="font-serif font-medium text-sm md:text-base">
-							{basic.birthInfo.time}
-						</p>
-					</div>
-				</div>
+				<motion.div 
+					className="grid grid-cols-2 md:grid-cols-4 gap-4"
+					variants={staggeredContainerVariants}
+					initial="hidden"
+					animate="visible"
+				>
+					{[
+						{ label: "년주", value: basic.birthInfo.year, delay: 0 },
+						{ label: "월주", value: basic.birthInfo.month, delay: 0.3 },
+						{ label: "일주", value: basic.birthInfo.day, delay: 0.6 },
+						{ label: "시주", value: basic.birthInfo.time, delay: 0.9 }
+					].map((pillar, index) => (
+						<motion.div
+							key={pillar.label}
+							className="text-center space-y-1"
+							variants={cardRevealVariants}
+							custom={index}
+							whileHover={{ 
+								scale: 1.05, 
+								rotateY: 5,
+								transition: { duration: 0.2 }
+							}}
+						>
+							<motion.div
+								className="relative p-4 rounded-2xl bg-gradient-to-br from-saju-cosmic-starlight/10 to-saju-cosmic-purple/10 border border-saju-traditional-gold/20"
+								variants={mysticalGlowVariants}
+								initial="initial"
+								animate="animate"
+								style={{ transformStyle: "preserve-3d" }}
+							>
+								<motion.p 
+									className="text-xs text-muted-foreground mb-2"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									transition={{ delay: pillar.delay + 0.2 }}
+								>
+									{pillar.label}
+								</motion.p>
+								<motion.p 
+									className="font-serif font-bold text-lg md:text-xl gradient-text"
+									initial={{ opacity: 0, y: 10 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ delay: pillar.delay + 0.4, type: "spring" }}
+								>
+									{pillar.value}
+								</motion.p>
+								
+								{/* 🌟 신비로운 장식 요소 */}
+								<motion.div
+									className="absolute top-1 right-1 w-2 h-2 bg-saju-traditional-gold rounded-full"
+									animate={{ 
+										scale: [1, 1.2, 1],
+										opacity: [0.5, 1, 0.5]
+									}}
+									transition={{
+										duration: 2,
+										repeat: Infinity,
+										delay: pillar.delay
+									}}
+								/>
+								<motion.div
+									className="absolute bottom-1 left-1 w-1.5 h-1.5 bg-saju-cosmic-starlight rounded-full"
+									animate={{ 
+										scale: [1, 1.3, 1],
+										opacity: [0.3, 0.8, 0.3]
+									}}
+									transition={{
+										duration: 2.5,
+										repeat: Infinity,
+										delay: pillar.delay + 0.5
+									}}
+								/>
+							</motion.div>
+						</motion.div>
+					))}
+				</motion.div>
 			</SajuCard>
 
 			{/* 한 줄 요약 */}
@@ -594,7 +635,7 @@ function TimelineAnalysis({ result }: { result: SajuResult }) {
 				</div>
 			</SajuCard>
 
-			<SajuCard title="연도별 운세 흐름 (예시)" variant="data">
+			<SajuCard title="연도별 운세 흐름" variant="data">
 				<LuckTimeline yearlyLuck={DUMMY_SAJU_RESULT.luck.yearly} />
 			</SajuCard>
 		</div>

@@ -2,7 +2,15 @@
   "name": "gae-saju",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0",
+    "npm": "please-use-pnpm",
+    "yarn": "please-use-pnpm"
+  },
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
@@ -14,7 +22,7 @@
     "test:integration": "jest --testPathPattern=tests/integration",
     "test:e2e": "playwright test",
     "test:e2e-ui": "playwright test --ui",
-    "test:all": "npm run test && npm run test:e2e"
+    "test:all": "pnpm run test && pnpm run test:e2e"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

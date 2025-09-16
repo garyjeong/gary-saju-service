@@ -46,7 +46,7 @@ const errorConfig = {
 		bgColor: "bg-purple-500/10",
 		title: "접근 권한 오류",
 		message: "해당 기능에 대한 접근 권한이 없습니다.",
-		actionText: "홈으로 돌아가기",
+		actionText: "다시 시도",
 	},
 	validation: {
 		icon: AlertTriangle,

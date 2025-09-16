@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { AlertTriangle, RefreshCw, Home, ArrowLeft, Sparkles, Bug } from "lucide-react";
+import { AlertTriangle, RefreshCw, ArrowLeft, Sparkles, Bug } from "lucide-react";
 import Link from "next/link";
 
 interface ErrorProps {
@@ -103,28 +103,6 @@ export default function Error({ error, reset }: ErrorProps) {
 							</CardContent>
 						</Card>
 
-						<Card className="glass-card border-none group hover:scale-105 transition-all duration-300">
-							<CardContent className="p-8 text-center space-y-6">
-								<div className="relative">
-									<div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-primary/20 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
-										<Home className="w-8 h-8 text-accent" />
-									</div>
-									<div className="absolute -inset-1 bg-gradient-to-r from-accent/20 to-primary/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
-								</div>
-								<div className="space-y-3">
-									<h3 className="text-xl font-serif font-medium text-foreground">홈으로 이동</h3>
-									<p className="text-sm text-muted-foreground">
-										메인 페이지에서 다시 시작해보세요
-									</p>
-								</div>
-								<Button asChild variant="outline" size="lg" className="w-full modern-card">
-									<Link href="/">
-										<Home className="w-4 h-4 mr-2" />
-										홈으로 가기
-									</Link>
-								</Button>
-							</CardContent>
-						</Card>
 					</div>
 
 					{/* 추천 액션 */}
@@ -144,13 +122,6 @@ export default function Error({ error, reset }: ErrorProps) {
 									<div className="text-left">
 										<div className="text-sm font-medium text-foreground">AI 사주 분석</div>
 										<div className="text-xs text-muted-foreground">개인화된 사주 해석을 받아보세요</div>
-									</div>
-								</div>
-								<div className="flex items-start gap-3 p-4 rounded-xl bg-accent/5 group hover:bg-accent/10 transition-colors duration-300">
-									<div className="w-3 h-3 rounded-full bg-gradient-to-br from-accent to-accent/60 mt-1.5 flex-shrink-0 group-hover:scale-125 transition-transform duration-300"></div>
-									<div className="text-left">
-										<div className="text-sm font-medium text-foreground">결과 예시</div>
-										<div className="text-xs text-muted-foreground">샘플 결과를 먼저 확인해보세요</div>
 									</div>
 								</div>
 							</div>

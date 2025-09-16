@@ -19,7 +19,9 @@ import {
 	copyToClipboard, 
 	nativeShare, 
 	isMobileDevice,
-	addUTMParameters 
+	addUTMParameters,
+	trackShareEvent,
+	generateShareUrl
 } from "@/lib/share/share-utils";
 import { extractShareData } from "@/lib/share/share-utils";
 import { SajuResult } from "@/lib/saju/types";
@@ -46,8 +48,9 @@ export default function ShareButtons({
 	}, []);
 
 	const shareData = extractShareData(sajuResult, sajuInput, aiInterpretation);
-	const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
-	const socialUrls = generateSocialShareUrls(currentUrl, shareData);
+	const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://gary-saju-service.vercel.app';
+	const shareUrl = generateShareUrl(shareData, baseUrl);
+	const socialUrls = generateSocialShareUrls(shareUrl, shareData);
 
 	// 네이티브 공유 (모바일)
 	const handleNativeShare = async () => {
@@ -61,10 +64,13 @@ export default function ShareButtons({
 			const success = await nativeShare({
 				title,
 				text,
-				url: addUTMParameters(currentUrl, 'native_share')
+				url: addUTMParameters(shareUrl, 'native_share')
 			});
 
 			if (success) {
+				// 🌟 공유 트래킹
+				trackShareEvent('native_share', shareData);
+				
 				toast({
 					title: "공유 완료!",
 					description: "성공적으로 공유되었습니다.",
@@ -83,10 +89,13 @@ export default function ShareButtons({
 
 	// 링크 복사
 	const handleCopyLink = async () => {
-		const utmUrl = addUTMParameters(currentUrl, 'link_share');
+		const utmUrl = addUTMParameters(shareUrl, 'link_share');
 		const success = await copyToClipboard(utmUrl);
 		
 		if (success) {
+			// 🌟 공유 트래킹
+			trackShareEvent('clipboard', shareData);
+			
 			toast({
 				title: "링크 복사됨!",
 				description: "클립보드에 복사되었습니다. 어디든 붙여넣어 공유하세요.",
@@ -104,6 +113,9 @@ export default function ShareButtons({
 	const handleSocialShare = (platform: keyof typeof socialUrls) => {
 		const url = addUTMParameters(socialUrls[platform], platform);
 		
+		// 🌟 공유 트래킹
+		trackShareEvent(platform, shareData);
+		
 		// 새 창에서 열기
 		const popup = window.open(
 			url,
@@ -116,9 +128,21 @@ export default function ShareButtons({
 			window.open(url, '_blank');
 		}
 
+		// 플랫폼별 맞춤 메시지
+		const platformNames: Record<string, string> = {
+			facebook: '페이스북',
+			twitter: '트위터',
+			kakao: '카카오톡',
+			line: '라인',
+			linkedin: '링크드인',
+			telegram: '텔레그램',
+			band: '네이버 밴드',
+			whatsapp: '왓츠앱'
+		};
+
 		toast({
 			title: "공유하기",
-			description: `${platform}으로 공유 창이 열렸습니다.`,
+			description: `${platformNames[platform] || platform}으로 공유 창이 열렸습니다.`,
 		});
 	};
 
@@ -143,7 +167,11 @@ export default function ShareButtons({
 							</div>
 						</div>
 						<Button
-							onClick={onDownload}
+							onClick={() => {
+								// 🌟 다운로드 트래킹
+								trackShareEvent('download', shareData);
+								onDownload?.();
+							}}
 							size="lg"
 							className="w-full gap-3 gradient-button text-white py-4 text-lg rounded-xl"
 							disabled={!onDownload}

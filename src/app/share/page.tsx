@@ -169,7 +169,7 @@ export default function SharePage() {
 					</div>
 
 					<div className="grid lg:grid-cols-2 gap-8 items-start">
-						{/* 사주 카드 미리보기 */}
+						{/* 공유 카드 */}
 						<div className="space-y-6">
 							<div className="flex items-center gap-3">
 								<div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
@@ -177,9 +177,9 @@ export default function SharePage() {
 								</div>
 								<div>
 									<h2 className="text-xl font-serif font-medium gradient-text">
-										공유 카드 미리보기
+										공유 카드
 									</h2>
-									<p className="text-sm text-muted-foreground">SNS에 올라갈 카드입니다</p>
+									<p className="text-sm text-muted-foreground">SNS에 공유할 카드입니다</p>
 								</div>
 							</div>
 
@@ -207,27 +207,19 @@ export default function SharePage() {
 					</div>
 
 					{/* 네비게이션 - Enhanced */}
-					<div className="flex flex-col sm:flex-row justify-between items-center gap-6 mt-16 pt-8">
+					<div className="flex flex-col sm:flex-row justify-center items-center gap-6 mt-16 pt-8">
 						<Button asChild variant="outline" size="lg" className="modern-card px-6 py-3 rounded-xl group">
 							<Link href="/result" className="flex items-center gap-2">
 								<ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
 								결과로 돌아가기
 							</Link>
 						</Button>
-						<div className="flex flex-col sm:flex-row gap-4">
-							<Button asChild variant="ghost" size="lg" className="px-6 py-3 rounded-xl group hover:bg-primary/10">
-								<Link href="/input" className="flex items-center gap-2">
-									다시 입력하기
-									<ArrowLeft className="w-4 h-4 rotate-180 group-hover:translate-x-1 transition-transform duration-300" />
-								</Link>
-							</Button>
-							<Button asChild variant="ghost" size="lg" className="px-6 py-3 rounded-xl group hover:bg-accent/10">
-								<Link href="/" className="flex items-center gap-2">
-									홈으로 돌아가기
-									<ArrowLeft className="w-4 h-4 rotate-180 group-hover:translate-x-1 transition-transform duration-300" />
-								</Link>
-							</Button>
-						</div>
+						<Button asChild variant="ghost" size="lg" className="px-6 py-3 rounded-xl group hover:bg-primary/10">
+							<Link href="/input" className="flex items-center gap-2">
+								다시 입력하기
+								<ArrowLeft className="w-4 h-4 rotate-180 group-hover:translate-x-1 transition-transform duration-300" />
+							</Link>
+						</Button>
 					</div>
 				</div>
 			</div>
