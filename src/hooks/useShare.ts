@@ -182,11 +182,7 @@ export function useShare(): [ShareState, ShareMethods] {
 				});
 
 				// 분석 추적
-				trackSajuEvent.shareGenerated({
-					platform: "general",
-					hasAI: !!params.aiInterpretation,
-					element: shareData.dominantElement,
-				});
+				trackSajuEvent.shareAttempt("social", "general");
 
 				console.log(`✨ 공유 링크 생성 완료: ${shareUrl}`);
 				return shareData;
@@ -245,10 +241,7 @@ export function useShare(): [ShareState, ShareMethods] {
 			});
 
 			// 분석 추적
-			trackSajuEvent.shareCompleted({
-				platform: "copy-link",
-				success: true,
-			});
+			trackSajuEvent.shareSuccess("clipboard", "copy-link");
 
 			return true;
 		} catch (error) {
@@ -297,10 +290,7 @@ export function useShare(): [ShareState, ShareMethods] {
 				});
 
 				// 분석 추적
-				trackSajuEvent.shareCompleted({
-					platform: "image-capture",
-					success: true,
-				});
+				trackSajuEvent.shareSuccess("download", "image-capture");
 
 				return blob;
 			} catch (error) {
@@ -360,10 +350,7 @@ export function useShare(): [ShareState, ShareMethods] {
 			});
 
 			// 분석 추적
-			trackSajuEvent.shareCompleted({
-				platform: "native-share",
-				success: true,
-			});
+			trackSajuEvent.shareSuccess("native", "native-share");
 
 			return true;
 		} catch (error: any) {
@@ -429,10 +416,7 @@ export function useShare(): [ShareState, ShareMethods] {
 			updateState({ lastSharedMethod: platform });
 
 			// 분석 추적
-			trackSajuEvent.shareCompleted({
-				platform,
-				success: true,
-			});
+			trackSajuEvent.shareSuccess("social", platform);
 		},
 		[state.socialUrls, updateState, createError]
 	);
@@ -466,10 +450,7 @@ export function useShare(): [ShareState, ShareMethods] {
 			setTimeout(() => URL.revokeObjectURL(url), 100);
 
 			// 분석 추적
-			trackSajuEvent.shareCompleted({
-				platform: "image-download",
-				success: true,
-			});
+			trackSajuEvent.shareSuccess("download", "image-download");
 		},
 		[state.capturedImage, state.shareData, createError, updateState]
 	);

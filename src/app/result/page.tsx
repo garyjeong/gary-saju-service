@@ -328,7 +328,7 @@ export default function ResultPage() {
 
 							{/* 출생정보 - 간소화됨 */}
 							<p className="text-muted-foreground text-sm">
-								{sajuInput.birthYear}년 {sajuInput.birthMonth}월 {sajuInput.birthDay}일 {sajuInput.birthHour}:{sajuInput.birthMinute} 출생
+								{sajuInput.birthDate} {sajuInput.birthTime} 출생
 							</p>
 						</div>
 					</div>

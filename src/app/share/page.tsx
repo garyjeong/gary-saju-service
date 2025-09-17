@@ -202,7 +202,6 @@ export default function SharePage() {
 							sajuResult={sajuResult}
 							sajuInput={sajuInput}
 							aiInterpretation={aiInterpretation}
-							onDownload={isGeneratingImage ? undefined : handleDownloadImage}
 						/>
 					</div>
 

@@ -197,7 +197,7 @@ export class GoogleAIUnifiedClient implements IAIClient {
 	 * 에러 처리 및 변환
 	 */
 	private handleError(error: any, retryCount: number): AIServiceError {
-		let errorCode = AI_ERROR_CODES.UNKNOWN_ERROR;
+		let errorCode = AI_ERROR_CODES.UNKNOWN_ERROR as any;
 		let message = "알 수 없는 오류가 발생했습니다";
 		let retryable = false;
 		let statusCode: number | undefined;

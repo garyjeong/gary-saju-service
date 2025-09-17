@@ -178,7 +178,7 @@ export class PromptTestRunner {
 					userProfile: {
 						age: 62,
 						gender: "other",
-						tone: "wisdom",
+						tone: "formal",
 						interests: ["health", "spirituality"],
 					},
 				},
@@ -249,7 +249,8 @@ export class PromptTestRunner {
 			metrics,
 			executionTime,
 			promptLength: prompt.length,
-			estimatedTokens: metadata.estimatedTokens || this.estimateTokens(prompt),
+			estimatedTokens:
+				(metadata as any)?.estimatedTokens || this.estimateTokens(prompt),
 		};
 	}
 

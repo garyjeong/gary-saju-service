@@ -380,6 +380,7 @@ export class AIMonitoringSystem {
 					type: "high_error_rate",
 					provider,
 					severity: "warning",
+					timestamp: now,
 					message: `높은 에러율 감지: ${provider} (${metrics.errorRate.toFixed(
 						2
 					)}%)`,
@@ -407,6 +408,7 @@ export class AIMonitoringSystem {
 					type: "slow_response",
 					provider,
 					severity: "warning",
+					timestamp: now,
 					message: `느린 응답 시간 감지: ${provider} (${event.metadata.responseTime}ms)`,
 					metadata: {
 						responseTime: event.metadata.responseTime,
@@ -424,6 +426,7 @@ export class AIMonitoringSystem {
 				type: "circuit_breaker_opened",
 				provider,
 				severity: "error",
+				timestamp: now,
 				message: `회로 차단기 열림: ${provider}`,
 				metadata: event.metadata,
 			});

@@ -254,7 +254,7 @@ export class AIServiceManager {
 
 			// 성공 시 통계 업데이트
 			this.updateSuccessStats(provider, responseTime);
-			this.resetCircuitBreaker(provider);
+			this.internalResetCircuitBreaker(provider);
 
 			// 성공 모니터링
 			aiMonitoring.recordRequestSuccess(provider, requestId, responseTime, {
@@ -424,7 +424,7 @@ export class AIServiceManager {
 				AI_ERROR_CODES.AUTH_INVALID_API_KEY,
 				AI_ERROR_CODES.AUTH_QUOTA_EXCEEDED,
 				AI_ERROR_CODES.SERVER_UNAVAILABLE,
-			].includes(error.errorCode)
+			].includes(error.errorCode as any)
 		) {
 			this.healthStatus.set(provider, false);
 		}
@@ -454,9 +454,9 @@ export class AIServiceManager {
 	}
 
 	/**
-	 * 서킷 브레이커 리셋
+	 * 서킷 브레이커 내부 리셋
 	 */
-	private resetCircuitBreaker(provider: AIProvider): void {
+	private internalResetCircuitBreaker(provider: AIProvider): void {
 		const breaker = this.circuitBreakers.get(provider);
 		if (breaker && (breaker.isOpen || breaker.failureCount > 0)) {
 			const wasOpen = breaker.isOpen;

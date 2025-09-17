@@ -389,8 +389,8 @@ export async function GET(request: NextRequest) {
         </div>
       ),
       {
-        width: sizeConfig?.width || 1200,
-        height: sizeConfig?.height || 630,
+        width: 1200,
+        height: 630,
       }
     );
   }

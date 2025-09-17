@@ -141,7 +141,7 @@ export default function TestSharePage() {
                         {Object.entries(stats.elementDistribution).map(([element, count]) => (
                           <div key={element} className="flex justify-between text-xs">
                             <span>{element}</span>
-                            <span>{count}개</span>
+                            <span>{count as number}개</span>
                           </div>
                         ))}
                       </div>

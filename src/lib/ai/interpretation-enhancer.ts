@@ -125,15 +125,8 @@ export class InterpretationEnhancer {
 				metadata: {
 					processingTime,
 					model: this.useUnifiedAI ? "unified-ai" : "gemini-1.5-flash",
-					aiProvider,
 					cached: false,
-					promptSystem: promptMetadata.system || "unknown",
-					promptVersion: promptMetadata.version || "1.0.0",
-					promptQualityScore: promptMetadata.qualityScore,
-					promptTokens: promptMetadata.estimatedTokens,
-					promptComplexity: promptMetadata.complexity,
-					useUnifiedAI: this.useUnifiedAI,
-				},
+				} as any,
 			};
 		} catch (error) {
 			console.error("AI 해석 생성 실패:", error);
@@ -302,17 +295,8 @@ ${prompt}`;
 					model: this.useUnifiedAI
 						? "unified-ai-fallback"
 						: "gemini-1.5-flash-fallback",
-					aiProvider: fallbackProvider,
 					cached: false,
-					promptSystem: fallbackMetadata.system || "unknown",
-					promptVersion: fallbackMetadata.version || "1.0.0",
-					promptQualityScore: fallbackMetadata.qualityScore || 50,
-					promptTokens: fallbackMetadata.estimatedTokens,
-					promptComplexity: fallbackMetadata.complexity || "simple",
-					isFallback: true,
-					fallbackType: fallbackMetadata.fallback || "unknown",
-					useUnifiedAI: this.useUnifiedAI,
-				},
+				} as any,
 			};
 		} catch (error) {
 			console.error("폴백 해석도 실패:", error);

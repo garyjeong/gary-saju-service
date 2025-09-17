@@ -14,7 +14,7 @@ import {
   CheckCircle, 
   XCircle, 
   AlertCircle, 
-  Browser,
+  Globe,
   Smartphone,
   Monitor,
   Wifi,
@@ -149,7 +149,7 @@ export default function BrowserCompatibilityTest() {
         {
           name: 'ES6 Modules',
           description: '모던 JavaScript 지원',
-          icon: <Browser className="w-4 h-4" />,
+          icon: <Globe className="w-4 h-4" />,
           test: () => {
             try {
               new Function('import("")');
@@ -237,7 +237,7 @@ export default function BrowserCompatibilityTest() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Browser className="w-5 h-5" />
+              <Globe className="w-5 h-5" />
               브라우저 환경 정보
             </CardTitle>
           </CardHeader>

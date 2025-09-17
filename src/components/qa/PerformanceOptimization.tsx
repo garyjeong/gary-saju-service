@@ -16,7 +16,7 @@ import {
   Image, 
   Timer,
   Cpu,
-  Memory,
+  HardDrive,
   Network,
   Target,
   Play,

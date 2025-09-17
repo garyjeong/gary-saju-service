@@ -60,6 +60,14 @@ export const PROVIDER_RETRY_STRATEGIES: Record<AIProvider, RetryStrategy> = {
 		jitterType: "full",
 		timeoutStrategy: "adaptive",
 	},
+	auto: {
+		...DEFAULT_RETRY_STRATEGY,
+		maxRetries: 3,
+		baseDelay: 1200,
+		enableCircuitBreaker: true,
+		circuitBreakerThreshold: 4,
+		circuitBreakerRecoveryTime: 90000, // 1.5분
+	},
 };
 
 /**

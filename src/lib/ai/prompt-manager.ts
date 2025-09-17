@@ -269,7 +269,7 @@ export class PromptManager {
 
 				const improvedResult = await this.generateSinglePrompt(
 					request,
-					improvedOptions
+					improvedOptions as any
 				);
 				const improvedScore = await this.estimateQuality(
 					improvedResult.prompt,
