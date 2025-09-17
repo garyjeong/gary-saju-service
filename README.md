@@ -22,6 +22,8 @@
 - **⚡ 고성능**: Next.js 15 + Turbopack으로 빠른 개발 경험
 - **🔒 타입 안전성**: TypeScript strict 모드로 안정성 보장
 - **🧪 완전한 테스트**: Jest + Playwright로 50개 테스트 구축
+- **🤖 지능형 AI**: 다중 공급자 지원, 자동 폴백, 서킷 브레이커
+- **🔄 안정성**: 재시도 전략, 에러 복구, 실시간 모니터링
 - **🐳 컨테이너화**: Docker로 간편한 배포 및 실행
 - **📊 분석 추적**: Vercel Analytics로 사용자 행동 분석
 - **🎨 이미지 처리**: html-to-image로 클라이언트 사이드 캡처
@@ -78,6 +80,9 @@ curl http://localhost:3000
 ### **AI & API**
 - [OpenAI API](https://openai.com) - 주 AI 해석 엔진
 - [Google AI Studio](https://ai.google.dev) - 대안 AI 서비스
+- **통합 AI 클라이언트**: 다중 공급자 지원 및 자동 폴백
+- **재시도 전략**: 지수 백오프, 지터, 서킷 브레이커
+- **AI 모니터링**: 실시간 성능 추적 및 알림
 - [Zod](https://zod.dev) - 스키마 검증
 
 ### **공유 & 미디어**
@@ -111,7 +116,13 @@ curl http://localhost:3000
 │   │   └── ui/            # 재사용 가능한 UI 컴포넌트
 │   ├── lib/               # 유틸리티 라이브러리
 │   │   ├── saju/          # 사주 계산 로직
-│   │   ├── ai/            # AI 서비스 연동
+│   │   ├── ai/            # AI 서비스 통합 시스템
+│   │   │   ├── clients/   # OpenAI/Google AI 클라이언트
+│   │   │   ├── ai-config.ts          # 환경변수 기반 설정
+│   │   │   ├── ai-service-manager.ts # 다중 공급자 관리
+│   │   │   ├── retry-strategies.ts   # 재시도 및 서킷브레이커
+│   │   │   └── ai-monitoring.ts      # 실시간 모니터링
+│   │   ├── share/         # 공유 기능
 │   │   └── analytics/     # 분석 도구
 │   └── hooks/             # React 커스텀 훅
 ├── tests/                 # 테스트 파일
@@ -163,8 +174,25 @@ docker run -d -p 3000:3000 \
 ### 환경 변수 설정
 ```bash
 # .env.local
+
+# AI 공급자 설정
 OPENAI_API_KEY=your_openai_api_key
 GOOGLE_AI_API_KEY=your_google_ai_api_key
+
+# AI 서비스 구성
+AI_DEFAULT_PROVIDER=auto          # auto, openai, google
+AI_FALLBACK_PROVIDER=google       # 기본 공급자 실패 시 사용
+AI_ENABLE_FALLBACK=true          # 폴백 활성화
+AI_ENABLE_CACHING=true           # 응답 캐싱 활성화
+AI_ENABLE_ANALYTICS=true         # AI 모니터링 활성화
+
+# 성능 및 제한 설정
+AI_MAX_REQUESTS_PER_HOUR=100     # 시간당 최대 요청 수
+AI_CACHE_EXPIRY_HOURS=24         # 캐시 만료 시간
+OPENAI_MAX_TOKENS=2000           # OpenAI 최대 토큰
+GOOGLE_AI_MAX_TOKENS=2000        # Google AI 최대 토큰
+
+# 사이트 설정
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 

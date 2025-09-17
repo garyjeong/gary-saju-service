@@ -17,6 +17,10 @@ import {
 	generateSimplePrompt,
 	generateFallbackPrompt,
 } from "./prompt-templates";
+import { PromptManager, PromptGenerationOptions } from "./prompt-manager";
+import { aiServiceManager } from "./ai-service-manager";
+import { UnifiedAIRequest } from "./ai-client-interface";
+import { AI_CONFIG } from "./ai-config";
 
 /**
  * AI 해석 강화 서비스 클래스
@@ -24,12 +28,30 @@ import {
 export class InterpretationEnhancer {
 	private readonly maxRetries = 3;
 	private readonly timeout = 30000; // 30초
+	private readonly promptManager: PromptManager;
+	private readonly useAdvancedPrompts: boolean;
+	private readonly useUnifiedAI: boolean;
+
+	constructor(
+		options: {
+			useAdvancedPrompts?: boolean;
+			useUnifiedAI?: boolean;
+		} = {}
+	) {
+		this.promptManager = new PromptManager();
+		this.useAdvancedPrompts =
+			options.useAdvancedPrompts ?? AI_CONFIG.features.enableAdvancedPrompts;
+		this.useUnifiedAI = options.useUnifiedAI ?? true; // 새로운 통합 시스템을 기본으로 사용
+	}
 
 	/**
 	 * 개인화된 사주 해석 생성
 	 */
 	async enhanceInterpretation(
-		request: AIInterpretationRequest
+		request: AIInterpretationRequest,
+		options: PromptGenerationOptions & {
+			enableFallback?: boolean;
+		} = {}
 	): Promise<AIInterpretationResponse> {
 		const startTime = Date.now();
 
@@ -37,11 +59,61 @@ export class InterpretationEnhancer {
 			// 요청 검증
 			validateAIRequest(request);
 
-			// AI 프롬프트 생성
-			const prompt = generatePersonalizedPrompt(request);
+			// AI 프롬프트 생성 (고도화된 시스템 또는 레거시)
+			let prompt: string;
+			let promptMetadata: any = {};
 
-			// Google AI API 호출
-			const aiResponse = await this.callGemini(prompt);
+			if (this.useAdvancedPrompts && !options.enableFallback) {
+				const promptResult = await this.promptManager.generatePrompt(request, {
+					theme: "modern_practical",
+					responseFormat: "detailed_json",
+					enableQualityCheck: true,
+					minQualityScore: 70,
+					...options,
+				});
+				prompt = promptResult.prompt;
+				promptMetadata = promptResult.metadata;
+			} else {
+				// 레거시 시스템 사용
+				prompt = generatePersonalizedPrompt(request);
+				promptMetadata = { system: "legacy", version: "1.0.0" };
+			}
+
+			// AI API 호출 (통합 시스템 또는 레거시)
+			let aiResponse: string;
+			let aiProvider = "unknown";
+
+			if (this.useUnifiedAI) {
+				// 새로운 통합 AI 시스템 사용
+				const unifiedRequest: UnifiedAIRequest = {
+					prompt,
+					maxTokens: promptMetadata.estimatedTokens
+						? Math.min(
+								promptMetadata.estimatedTokens + 500,
+								AI_CONFIG.limits.maxTokensPerRequest
+						  )
+						: 2000,
+					temperature: 0.7,
+					metadata: {
+						requestId: `saju_${Date.now()}`,
+						context: {
+							service: "saju-interpretation",
+							useAdvancedPrompts: this.useAdvancedPrompts,
+							promptVersion: promptMetadata.version,
+						},
+					},
+				};
+
+				const response = await aiServiceManager.generateCompletion(
+					unifiedRequest
+				);
+				aiResponse = response.content;
+				aiProvider = response.provider;
+			} else {
+				// 레거시 Google AI 시스템 사용
+				aiResponse = await this.callGemini(prompt);
+				aiProvider = "google-legacy";
+			}
 
 			// 응답 파싱 및 검증
 			const enhancedInterpretation = parseGeminiResponse(aiResponse);
@@ -52,8 +124,15 @@ export class InterpretationEnhancer {
 				enhancedInterpretation,
 				metadata: {
 					processingTime,
-					model: "gemini-1.5-flash",
+					model: this.useUnifiedAI ? "unified-ai" : "gemini-1.5-flash",
+					aiProvider,
 					cached: false,
+					promptSystem: promptMetadata.system || "unknown",
+					promptVersion: promptMetadata.version || "1.0.0",
+					promptQualityScore: promptMetadata.qualityScore,
+					promptTokens: promptMetadata.estimatedTokens,
+					promptComplexity: promptMetadata.complexity,
+					useUnifiedAI: this.useUnifiedAI,
 				},
 			};
 		} catch (error) {
@@ -146,9 +225,73 @@ ${prompt}`;
 		processingTime: number
 	): Promise<AIInterpretationResponse> {
 		try {
-			// 간단한 프롬프트로 재시도
-			const fallbackPrompt = generateFallbackPrompt(request.sajuResult);
-			const response = await this.callGemini(fallbackPrompt);
+			// 고도화된 시스템이 실패했을 때 레거시 시스템으로 폴백
+			let fallbackPrompt: string;
+			let fallbackMetadata: any = {};
+
+			if (this.useAdvancedPrompts) {
+				// 고도화된 시스템의 폴백 (간단한 설정으로)
+				try {
+					const promptResult = await this.promptManager.generatePrompt(
+						request,
+						{
+							useAdvancedSystem: true,
+							theme: "modern_practical",
+							responseFormat: "simple_json",
+							enableQualityCheck: false,
+							maxTokens: 1000,
+						}
+					);
+					fallbackPrompt = promptResult.prompt;
+					fallbackMetadata = { ...promptResult.metadata, fallback: "advanced" };
+				} catch {
+					// 고도화된 시스템도 실패하면 레거시로
+					fallbackPrompt = generateFallbackPrompt(request.sajuResult);
+					fallbackMetadata = {
+						system: "legacy",
+						version: "1.0.0",
+						fallback: "legacy",
+					};
+				}
+			} else {
+				// 레거시 시스템 폴백
+				fallbackPrompt = generateFallbackPrompt(request.sajuResult);
+				fallbackMetadata = {
+					system: "legacy",
+					version: "1.0.0",
+					fallback: "legacy",
+				};
+			}
+
+			// AI API 호출 (통합 시스템 또는 레거시)
+			let response: string;
+			let fallbackProvider = "unknown";
+
+			if (this.useUnifiedAI) {
+				// 새로운 통합 AI 시스템 사용 (폴백 모드)
+				const unifiedRequest: UnifiedAIRequest = {
+					prompt: fallbackPrompt,
+					maxTokens: 1000, // 폴백은 더 짧게
+					temperature: 0.5, // 폴백은 더 보수적으로
+					metadata: {
+						requestId: `saju_fallback_${Date.now()}`,
+						context: {
+							service: "saju-interpretation-fallback",
+							isFallback: true,
+						},
+					},
+				};
+
+				const unifiedResponse = await aiServiceManager.generateCompletion(
+					unifiedRequest
+				);
+				response = unifiedResponse.content;
+				fallbackProvider = unifiedResponse.provider;
+			} else {
+				// 레거시 Google AI 시스템 사용
+				response = await this.callGemini(fallbackPrompt);
+				fallbackProvider = "google-legacy";
+			}
 
 			const enhancedInterpretation = parseGeminiResponse(response);
 
@@ -156,8 +299,19 @@ ${prompt}`;
 				enhancedInterpretation,
 				metadata: {
 					processingTime,
-					model: "gemini-1.5-flash-fallback",
+					model: this.useUnifiedAI
+						? "unified-ai-fallback"
+						: "gemini-1.5-flash-fallback",
+					aiProvider: fallbackProvider,
 					cached: false,
+					promptSystem: fallbackMetadata.system || "unknown",
+					promptVersion: fallbackMetadata.version || "1.0.0",
+					promptQualityScore: fallbackMetadata.qualityScore || 50,
+					promptTokens: fallbackMetadata.estimatedTokens,
+					promptComplexity: fallbackMetadata.complexity || "simple",
+					isFallback: true,
+					fallbackType: fallbackMetadata.fallback || "unknown",
+					useUnifiedAI: this.useUnifiedAI,
 				},
 			};
 		} catch (error) {
