@@ -6,6 +6,19 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 
+// OG 이미지 파라미터 타입 정의
+interface OGImageParams {
+  name: string;
+  element: '목' | '화' | '토' | '금' | '수' | '미지';
+  keywords: string[];
+  summary: string;
+  birthInfo?: string;
+  tone?: 'formal' | 'casual' | 'poetic';
+  theme?: 'fire' | 'wood' | 'earth' | 'metal' | 'water' | 'auto';
+  size?: '1200x630' | '1200x1200' | '1080x1920';
+  format?: 'png' | 'jpeg';
+}
+
 // 오행별 색상 설정 (전통 한국 테마)
 const elementColors = {
   목: { primary: '#2D5016', secondary: '#8FBC8F', bg: '#F0FFF0', emoji: '🌳' },
@@ -16,20 +29,48 @@ const elementColors = {
   미지: { primary: '#696969', secondary: '#A9A9A9', bg: '#F5F5F5', emoji: '✨' }
 } as const;
 
+// 파라미터 검증 및 파싱 유틸리티
+function parseOGParams(searchParams: URLSearchParams): OGImageParams {
+  const name = searchParams.get('name') || '익명';
+  const element = (searchParams.get('element') as OGImageParams['element']) || '미지';
+  const keywords = searchParams.get('keywords')?.split(',').filter(k => k.trim()) || ['신비로운', '독특한', '특별한'];
+  const summary = searchParams.get('summary') || '나만의 특별한 사주';
+  const birthInfo = searchParams.get('birthInfo') || '';
+  const tone = (searchParams.get('tone') as OGImageParams['tone']) || 'casual';
+  const theme = (searchParams.get('theme') as OGImageParams['theme']) || 'auto';
+  const size = (searchParams.get('size') as OGImageParams['size']) || '1200x630';
+  const format = (searchParams.get('format') as OGImageParams['format']) || 'png';
+
+  return {
+    name: name.slice(0, 10), // 이름 길이 제한
+    element: ['목', '화', '토', '금', '수', '미지'].includes(element) ? element : '미지',
+    keywords: keywords.slice(0, 3), // 키워드 3개 제한
+    summary: summary.slice(0, 100), // 요약 길이 제한
+    birthInfo,
+    tone,
+    theme,
+    size,
+    format
+  } as OGImageParams;
+}
+
+// 크기별 이미지 설정
+const sizeConfigs = {
+  '1200x630': { width: 1200, height: 630, type: 'og' }, // 기본 OG
+  '1200x1200': { width: 1200, height: 1200, type: 'square' }, // Instagram/카카오
+  '1080x1920': { width: 1080, height: 1920, type: 'story' } // 스토리용
+} as const;
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     
-    // URL 파라미터에서 사주 정보 추출
-    const name = searchParams.get('name') || '익명';
-    const element = searchParams.get('element') || '미지';
-    const keywords = searchParams.get('keywords')?.split(',') || ['신비로운', '독특한', '특별한'];
-    const birthInfo = searchParams.get('birthInfo') || '';
-    const tone = searchParams.get('tone') || 'casual';
-    const summary = searchParams.get('summary') || '나만의 특별한 사주';
+    // 파라미터 파싱 및 검증
+    const params = parseOGParams(searchParams);
+    const sizeConfig = sizeConfigs[params.size] || sizeConfigs['1200x630'];
 
     // 해당 오행의 색상 테마 적용
-    const colors = elementColors[element as keyof typeof elementColors] || elementColors['미지'];
+    const colors = elementColors[params.element] || elementColors['미지'];
 
     return new ImageResponse(
       (
@@ -134,14 +175,14 @@ export async function GET(request: NextRequest) {
             >
               <h2
                 style={{
-                  fontSize: '72px',
+                  fontSize: sizeConfig.type === 'story' ? '48px' : '72px',
                   fontWeight: 'bold',
                   color: colors.primary,
                   margin: 0,
                   textShadow: `2px 2px 4px ${colors.primary}20`,
                 }}
               >
-                {name}님의 사주
+                {params.name}님의 사주
               </h2>
               
               <div
@@ -173,7 +214,7 @@ export async function GET(request: NextRequest) {
                     color: colors.primary,
                   }}
                 >
-                  {element} 기운
+                  {params.element} 기운
                 </span>
               </div>
             </div>
@@ -188,7 +229,7 @@ export async function GET(request: NextRequest) {
                 justifyContent: 'center',
               }}
             >
-              {keywords.slice(0, 3).map((keyword, index) => (
+              {params.keywords.map((keyword, index) => (
                 <div
                   key={keyword}
                   style={{
@@ -208,7 +249,7 @@ export async function GET(request: NextRequest) {
             </div>
 
             {/* 요약 */}
-            {summary && (
+            {params.summary && (
               <div
                 style={{
                   background: 'white',
@@ -224,12 +265,12 @@ export async function GET(request: NextRequest) {
                   marginBottom: '40px',
                 }}
               >
-                "{summary}"
+                &ldquo;{params.summary}&rdquo;
               </div>
             )}
 
             {/* 출생 정보 */}
-            {birthInfo && (
+            {params.birthInfo && (
               <div
                 style={{
                   background: `${colors.primary}10`,
@@ -241,7 +282,7 @@ export async function GET(request: NextRequest) {
                   marginBottom: '30px',
                 }}
               >
-                {birthInfo}
+                {params.birthInfo}
               </div>
             )}
 
@@ -300,10 +341,12 @@ export async function GET(request: NextRequest) {
         </div>
       ),
       {
-        width: 1200,
-        height: 630,
+        width: sizeConfig.width,
+        height: sizeConfig.height,
         headers: {
-          'Cache-Control': 'public, max-age=31536000, immutable',
+          'Cache-Control': 'public, max-age=86400, s-maxage=86400',
+          'Content-Type': params.format === 'jpeg' ? 'image/jpeg' : 'image/png',
+          'Vary': 'Accept',
         },
       }
     );
@@ -346,8 +389,8 @@ export async function GET(request: NextRequest) {
         </div>
       ),
       {
-        width: 1200,
-        height: 630,
+        width: sizeConfig?.width || 1200,
+        height: sizeConfig?.height || 630,
       }
     );
   }

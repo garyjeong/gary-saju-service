@@ -1,0 +1,86 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"command": "pnpm",
+			"args": ["dev"],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"label": "🚀 Gary Saju Service: Development Server",
+			"detail": "pnpm을 사용한 Next.js 개발 서버 실행 (Turbopack, Port: 3000)",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "new",
+				"showReuseMessage": true,
+				"clear": false
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				{
+					"pattern": [
+						{
+							"regexp": ".",
+							"file": 1,
+							"location": 2,
+							"message": 3
+						}
+					],
+					"background": {
+						"activeOnStart": true,
+						"beginsPattern": "- info compiling",
+						"endsPattern": "- ready"
+					}
+				}
+			],
+			"runOptions": {
+				"runOn": "folderOpen"
+			}
+		},
+		{
+			"type": "shell",
+			"command": "pnpm",
+			"args": ["test:watch"],
+			"group": "test",
+			"label": "🧪 Jest: Watch Mode",
+			"detail": "Jest 테스트를 감시 모드로 실행",
+			"presentation": {
+				"echo": true,
+				"reveal": "onProblem",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"type": "shell",
+			"command": "pnpm",
+			"args": ["build"],
+			"group": "build",
+			"label": "🔨 Next.js: Production Build",
+			"detail": "프로덕션용 빌드 생성",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "new",
+				"showReuseMessage": true,
+				"clear": true
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": "$tsc"
+		}
+	]
+}

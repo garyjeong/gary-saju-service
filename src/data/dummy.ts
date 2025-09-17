@@ -1,14 +1,7 @@
 /**
  * 개-사주 서비스 더미 데이터
- * T-002: UI-only 목업용 샘플 데이터
+ * 결과 페이지 UI 개발용 샘플 데이터
  */
-
-export const DUMMY_USER = {
-	name: "김민지",
-	birthDate: "1995-03-15",
-	birthTime: "14:30",
-	gender: "female" as const,
-} as const;
 
 export const DUMMY_SAJU_RESULT = {
 	// 기본 사주 정보
@@ -88,21 +81,4 @@ export const DUMMY_SAJU_RESULT = {
 			},
 		],
 	},
-} as const;
-
-export const DUMMY_SHARE_CARD = {
-	title: "김민지님의 사주 풀이",
-	subtitle: "을해년 기묘월 정축일 정미시",
-	keyWords: ["창의적", "리더십", "배려심"],
-	dominantElement: "화(火)",
-	luckyColor: "#E67E22",
-	description: "따뜻한 마음과 창의적 사고의 소유자",
-} as const;
-
-export const DUMMY_TODAY_FORTUNE = {
-	date: "2024년 1월 15일",
-	keyword: "새로운 시작",
-	description: "오늘은 새로운 아이디어를 실행에 옮기기 좋은 날입니다.",
-	score: 88,
-	advice: "오후 시간대에 중요한 결정을 내리는 것이 유리합니다.",
 } as const;

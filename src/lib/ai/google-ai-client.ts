@@ -121,7 +121,7 @@ export function parseGeminiResponse(response: string): any {
 			"summary",
 		];
 
-		let missingFields = [];
+		const missingFields = [];
 		for (const field of requiredFields) {
 			if (
 				!parsed[field] ||

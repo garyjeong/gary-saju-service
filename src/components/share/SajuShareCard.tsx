@@ -238,7 +238,7 @@ export default function SajuShareCard({
 							<div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-saju-traditional-gold/50 to-transparent"></div>
 							<div className="hanji-card p-6 bg-gradient-to-br from-saju-traditional-white/95 to-saju-traditional-white/85 backdrop-blur-sm border border-saju-traditional-gold/20 shadow-xl">
 								<p className="saju-interpretation emphasis-mystic text-lg leading-relaxed">
-									"{shareData.summary}"
+									&ldquo;{shareData.summary}&rdquo;
 								</p>
 							</div>
 						</motion.div>

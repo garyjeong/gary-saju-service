@@ -23,6 +23,7 @@ import { AIStageLoading } from "@/components/ui/ai-loading";
 import { AIServiceError } from "@/components/ui/enhanced-error";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import ShareButtons from "@/components/share/ShareButtons";
 
 const tabs = [
 	{ id: "basic", label: "기본 풀이", description: "성격 & 특성" },
@@ -95,6 +96,9 @@ export default function ResultPage() {
 	const [showCards, setShowCards] = useState(false);
 	const [revealedCards, setRevealedCards] = useState<boolean[]>([false, false, false, false]);
 	const controls = useAnimation();
+	
+	// 🌟 이미지 캡처용 ref
+	const captureRef = React.useRef<HTMLDivElement>(null);
 	
 	// 🌟 카드 순차 공개 함수
 	const startCardRevealSequence = () => {
@@ -352,21 +356,21 @@ export default function ResultPage() {
 				</div>
 			</section>
 
-			{/* 탭 콘텐츠 */}
-			<section className="py-8">
+			{/* 탭 콘텐츠 - 캡처 영역 */}
+			<section className="py-8" ref={captureRef}>
 				<div className="container mx-auto px-4">
 					{renderTabContent()}
 				</div>
 			</section>
 
-			{/* 액션 버튼 - Enhanced */}
+			{/* 공유 및 저장 기능 */}
 			<section className="relative py-12 md:py-16 overflow-hidden">
 				{/* Background */}
 				<div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-background to-primary/5"></div>
 				
-				<div className="container mx-auto px-4 text-center relative z-10">
+				<div className="container mx-auto px-4 relative z-10">
 					<div className="max-w-4xl mx-auto space-y-8">
-						<div className="space-y-4">
+						<div className="text-center space-y-4">
 							<h3 className="text-2xl md:text-3xl font-serif font-bold gradient-text">
 								결과를 공유하고 저장하세요
 							</h3>
@@ -375,37 +379,15 @@ export default function ResultPage() {
 							</p>
 						</div>
 
-						<div className={cn(
-							"flex justify-center gap-4 md:gap-6",
-							isMobile ? "flex-col max-w-sm mx-auto" : "flex-row"
-						)}>
-							<div className="relative group">
-								<Button asChild size="lg" className="gradient-button text-white px-8 py-4 text-lg rounded-2xl shadow-xl group-hover:shadow-2xl group-hover:scale-105 transition-all duration-300">
-									<Link href="/share" className="flex items-center gap-3">
-										<Share2 className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" />
-										SNS 공유하기
-									</Link>
-								</Button>
-								<div className="absolute -inset-1 bg-gradient-to-r from-primary/40 to-accent/40 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-							</div>
-
-							<div className="relative group">
-								<Button 
-									variant="outline" 
-									size="lg" 
-									className="modern-card px-8 py-4 text-lg rounded-2xl backdrop-blur-sm group-hover:scale-105 transition-all duration-300"
-									onClick={() => {
-										// TODO: 이미지 저장 기능 구현
-										alert('이미지 저장 기능은 곧 제공될 예정입니다!');
-									}}
-								>
-									<Download className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform duration-300" />
-									이미지로 저장
-								</Button>
-								<div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-							</div>
-						</div>
-						
+						{/* ShareButtons 컴포넌트 사용 */}
+						{sajuResult && sajuInput && (
+							<ShareButtons
+								sajuResult={sajuResult}
+								sajuInput={sajuInput}
+								aiInterpretation={JSON.parse(sessionStorage.getItem("aiInterpretation") || "null")}
+								captureElementRef={captureRef}
+							/>
+						)}
 					</div>
 				</div>
 			</section>

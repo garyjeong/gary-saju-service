@@ -110,7 +110,7 @@ export function generateShareUrl(
 /**
  * 공유 ID 생성 (간단한 해시 기반)
  */
-function generateShareId(
+export function generateShareId(
 	shareData: ReturnType<typeof extractShareData>
 ): string {
 	const dataString = `${shareData.name}-${shareData.dominantElement}-${shareData.birthInfo}`;

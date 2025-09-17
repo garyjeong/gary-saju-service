@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
@@ -12,18 +12,11 @@ import {
 	Facebook, 
 	Twitter,
 	Smartphone,
-	ExternalLink
+	ExternalLink,
+	Loader2,
+	AlertCircle
 } from "lucide-react";
-import { 
-	generateSocialShareUrls, 
-	copyToClipboard, 
-	nativeShare, 
-	isMobileDevice,
-	addUTMParameters,
-	trackShareEvent,
-	generateShareUrl
-} from "@/lib/share/share-utils";
-import { extractShareData } from "@/lib/share/share-utils";
+import { useShare } from "@/hooks/useShare";
 import { SajuResult } from "@/lib/saju/types";
 import { SajuInputType } from "@/lib/saju/validation";
 
@@ -31,104 +24,128 @@ interface ShareButtonsProps {
 	sajuResult: SajuResult;
 	sajuInput: SajuInputType;
 	aiInterpretation?: any;
-	onDownload?: () => void;
+	captureElementRef?: React.RefObject<HTMLElement>;
 }
 
 export default function ShareButtons({ 
 	sajuResult, 
 	sajuInput, 
 	aiInterpretation,
-	onDownload 
+	captureElementRef
 }: ShareButtonsProps) {
-	const [isSharing, setIsSharing] = useState(false);
-	const [isMobile, setIsMobile] = useState(false);
+	const [shareState, shareMethods] = useShare();
+	// 모바일 기기 및 공유 기능 감지
+	const [deviceInfo, setDeviceInfo] = React.useState({
+		isMobile: false,
+		hasNativeShare: false,
+		isIOS: false,
+		isAndroid: false,
+		canInstall: false
+	});
+	const shareDataInitialized = React.useRef(false);
 	
 	React.useEffect(() => {
-		setIsMobile(isMobileDevice());
+		const detectDevice = () => {
+			const userAgent = navigator.userAgent;
+			const isMobileDevice = window.innerWidth < 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+			const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent);
+			const isAndroidDevice = /Android/.test(userAgent);
+			const hasWebShare = !!navigator.share;
+			const canInstallPWA = 'serviceWorker' in navigator && 'BeforeInstallPromptEvent' in window;
+
+			setDeviceInfo({
+				isMobile: isMobileDevice,
+				hasNativeShare: hasWebShare,
+				isIOS: isIOSDevice,
+				isAndroid: isAndroidDevice,
+				canInstall: canInstallPWA
+			});
+		};
+		
+		detectDevice();
+		window.addEventListener('resize', detectDevice);
+		return () => window.removeEventListener('resize', detectDevice);
 	}, []);
 
-	const shareData = extractShareData(sajuResult, sajuInput, aiInterpretation);
-	const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://gary-saju-service.vercel.app';
-	const shareUrl = generateShareUrl(shareData, baseUrl);
-	const socialUrls = generateSocialShareUrls(shareUrl, shareData);
+	// 컴포넌트 마운트 시 공유 데이터 생성
+	React.useEffect(() => {
+		if (!shareDataInitialized.current && sajuResult && sajuInput) {
+			shareMethods.generateShareData({
+				sajuResult,
+				sajuInput,
+				aiInterpretation
+			});
+			shareDataInitialized.current = true;
+		}
+	}, [sajuResult, sajuInput, aiInterpretation, shareMethods]);
+
+	// 에러 상태 처리
+	React.useEffect(() => {
+		if (shareState.error) {
+			toast({
+				title: "오류 발생",
+				description: shareState.error.message,
+				variant: "destructive",
+				action: shareState.error.retry ? (
+					<Button 
+						onClick={shareState.error.retry} 
+						variant="outline" 
+						size="sm"
+					>
+						재시도
+					</Button>
+				) : undefined
+			});
+		}
+	}, [shareState.error]);
 
 	// 네이티브 공유 (모바일)
 	const handleNativeShare = async () => {
-		if (isSharing) return;
-		
-		setIsSharing(true);
-		try {
-			const title = `${shareData.name}님의 사주 - 개-사주`;
-			const text = `${shareData.dominantElement} 기운 중심의 ${shareData.keywords.join(', ')} 성향. AI가 해석한 나만의 사주를 확인해보세요!`;
-			
-			const success = await nativeShare({
-				title,
-				text,
-				url: addUTMParameters(shareUrl, 'native_share')
+		const success = await shareMethods.shareNative();
+		if (success) {
+			toast({
+				title: "공유 완료!",
+				description: "성공적으로 공유되었습니다.",
 			});
-
-			if (success) {
-				// 🌟 공유 트래킹
-				trackShareEvent('native_share', shareData);
-				
-				toast({
-					title: "공유 완료!",
-					description: "성공적으로 공유되었습니다.",
-				});
-			} else {
-				// 폴백: 클립보드 복사
-				await handleCopyLink();
-			}
-		} catch (error) {
-			console.error('네이티브 공유 오류:', error);
-			await handleCopyLink();
-		} finally {
-			setIsSharing(false);
 		}
 	};
 
 	// 링크 복사
 	const handleCopyLink = async () => {
-		const utmUrl = addUTMParameters(shareUrl, 'link_share');
-		const success = await copyToClipboard(utmUrl);
-		
+		const success = await shareMethods.copyLink();
 		if (success) {
-			// 🌟 공유 트래킹
-			trackShareEvent('clipboard', shareData);
-			
 			toast({
 				title: "링크 복사됨!",
 				description: "클립보드에 복사되었습니다. 어디든 붙여넣어 공유하세요.",
 			});
-		} else {
+		}
+	};
+
+	// 이미지 캡처 및 다운로드
+	const handleDownloadImage = async () => {
+		if (!captureElementRef?.current) {
 			toast({
-				title: "복사 실패",
-				description: "링크를 수동으로 복사해주세요.",
+				title: "오류 발생",
+				description: "캡처할 요소를 찾을 수 없습니다.",
 				variant: "destructive",
+			});
+			return;
+		}
+
+		const blob = await shareMethods.captureImage(captureElementRef.current);
+		if (blob) {
+			shareMethods.downloadImage(blob);
+			toast({
+				title: "다운로드 완료!",
+				description: "이미지가 저장되었습니다.",
 			});
 		}
 	};
 
 	// 소셜 미디어 공유
-	const handleSocialShare = (platform: keyof typeof socialUrls) => {
-		const url = addUTMParameters(socialUrls[platform], platform);
+	const handleSocialShare = (platform: string) => {
+		shareMethods.shareToSocial(platform as any);
 		
-		// 🌟 공유 트래킹
-		trackShareEvent(platform, shareData);
-		
-		// 새 창에서 열기
-		const popup = window.open(
-			url,
-			`share_${platform}`,
-			'width=600,height=400,scrollbars=yes,resizable=yes'
-		);
-
-		// 팝업이 차단된 경우 직접 이동
-		if (!popup) {
-			window.open(url, '_blank');
-		}
-
-		// 플랫폼별 맞춤 메시지
 		const platformNames: Record<string, string> = {
 			facebook: '페이스북',
 			twitter: '트위터',
@@ -145,6 +162,54 @@ export default function ShareButtons({
 			description: `${platformNames[platform] || platform}으로 공유 창이 열렸습니다.`,
 		});
 	};
+
+	// 공유 데이터 생성 중일 때 로딩 표시
+	if (shareState.isGenerating || !shareState.shareData) {
+		return (
+			<div className="space-y-8">
+				<Card className="modern-card">
+					<CardContent className="p-8 flex flex-col items-center justify-center space-y-4">
+						<Loader2 className="w-12 h-12 animate-spin text-primary" />
+						<div className="text-center">
+							<h3 className="text-lg font-serif font-medium text-foreground">공유 준비 중...</h3>
+							<p className="text-sm text-muted-foreground">
+								공유 링크와 이미지를 생성하고 있습니다
+							</p>
+						</div>
+					</CardContent>
+				</Card>
+			</div>
+		);
+	}
+
+	// 에러 상태 표시
+	if (shareState.error && !shareState.shareData) {
+		return (
+			<div className="space-y-8">
+				<Card className="modern-card border-destructive/20 bg-destructive/5">
+					<CardContent className="p-8 flex flex-col items-center justify-center space-y-4">
+						<AlertCircle className="w-12 h-12 text-destructive" />
+						<div className="text-center">
+							<h3 className="text-lg font-serif font-medium text-foreground">공유 기능 오류</h3>
+							<p className="text-sm text-muted-foreground mb-4">
+								{shareState.error.message}
+							</p>
+							{shareState.error.retry && (
+								<Button 
+									onClick={shareState.error.retry}
+									variant="outline"
+									className="gap-2"
+								>
+									<Loader2 className="w-4 h-4" />
+									다시 시도
+								</Button>
+							)}
+						</div>
+					</CardContent>
+				</Card>
+			</div>
+		);
+	}
 
 	return (
 		<div className="space-y-8">
@@ -167,17 +232,22 @@ export default function ShareButtons({
 							</div>
 						</div>
 						<Button
-							onClick={() => {
-								// 🌟 다운로드 트래킹
-								trackShareEvent('download', shareData);
-								onDownload?.();
-							}}
+							onClick={handleDownloadImage}
 							size="lg"
 							className="w-full gap-3 gradient-button text-white py-4 text-lg rounded-xl"
-							disabled={!onDownload}
+							disabled={shareState.isCapturing || !captureElementRef?.current}
 						>
-							<Download className="w-5 h-5" />
-							PNG 이미지로 저장
+							{shareState.isCapturing ? (
+								<>
+									<Loader2 className="w-5 h-5 animate-spin" />
+									이미지 생성 중...
+								</>
+							) : (
+								<>
+									<Download className="w-5 h-5" />
+									PNG 이미지로 저장
+								</>
+							)}
 						</Button>
 					</CardContent>
 				</Card>
@@ -185,7 +255,7 @@ export default function ShareButtons({
 			</div>
 
 			{/* 네이티브 공유 (모바일에서만) */}
-			{isMobile && (
+			{deviceInfo.hasNativeShare && (
 				<div className="relative group">
 					<Card className="modern-card group-hover:scale-[1.02] transition-all duration-300">
 						<CardContent className="p-8 space-y-6">
@@ -197,9 +267,13 @@ export default function ShareButtons({
 									<div className="absolute -inset-1 bg-gradient-to-r from-accent/20 to-primary/20 rounded-2xl blur-lg opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
 								</div>
 								<div className="flex-1">
-									<h3 className="text-lg font-serif font-medium text-foreground">빠른 공유</h3>
+									<h3 className="text-lg font-serif font-medium text-foreground">
+										{deviceInfo.isIOS ? 'iOS 공유' : deviceInfo.isAndroid ? 'Android 공유' : '빠른 공유'}
+									</h3>
 									<p className="text-sm text-muted-foreground">
-										설치된 앱으로 바로 공유하기
+										{deviceInfo.isIOS ? 'AirDrop, 메시지 등으로 공유' : 
+										 deviceInfo.isAndroid ? '설치된 앱으로 바로 공유' : 
+										 '설치된 앱으로 바로 공유하기'}
 									</p>
 								</div>
 							</div>
@@ -207,10 +281,19 @@ export default function ShareButtons({
 								onClick={handleNativeShare}
 								size="lg"
 								className="w-full gap-3 gradient-button text-white py-4 text-lg rounded-xl"
-								disabled={isSharing}
+								disabled={shareState.isSharing}
 							>
-								<Share2 className="w-5 h-5" />
-								{isSharing ? "공유 중..." : "앱으로 공유하기"}
+								{shareState.isSharing ? (
+									<>
+										<Loader2 className="w-5 h-5 animate-spin" />
+										공유 중...
+									</>
+								) : (
+									<>
+										<Share2 className="w-5 h-5" />
+										{deviceInfo.isIOS ? 'iOS 공유하기' : deviceInfo.isAndroid ? 'Android 공유하기' : '앱으로 공유하기'}
+									</>
+								)}
 							</Button>
 						</CardContent>
 					</Card>
@@ -240,9 +323,19 @@ export default function ShareButtons({
 							variant="outline"
 							size="lg"
 							className="w-full gap-3 py-4 text-lg rounded-xl modern-card"
+							disabled={shareState.isCopying}
 						>
-							<Copy className="w-5 h-5" />
-							링크 복사하기
+							{shareState.isCopying ? (
+								<>
+									<Loader2 className="w-5 h-5 animate-spin" />
+									복사 중...
+								</>
+							) : (
+								<>
+									<Copy className="w-5 h-5" />
+									링크 복사하기
+								</>
+							)}
 						</Button>
 					</CardContent>
 				</Card>
@@ -272,6 +365,7 @@ export default function ShareButtons({
 								size="lg" 
 								className="gap-3 py-4 rounded-xl modern-card group"
 								onClick={() => handleSocialShare('facebook')}
+								disabled={shareState.isGenerating || !shareState.socialUrls}
 							>
 								<Facebook className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
 								페이스북
@@ -281,6 +375,7 @@ export default function ShareButtons({
 								size="lg" 
 								className="gap-3 py-4 rounded-xl modern-card group"
 								onClick={() => handleSocialShare('twitter')}
+								disabled={shareState.isGenerating || !shareState.socialUrls}
 							>
 								<Twitter className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
 								트위터
@@ -290,6 +385,7 @@ export default function ShareButtons({
 								size="lg" 
 								className="gap-3 py-4 rounded-xl modern-card group"
 								onClick={() => handleSocialShare('kakao')}
+								disabled={shareState.isGenerating || !shareState.socialUrls}
 							>
 								<MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
 								카카오톡
@@ -299,6 +395,7 @@ export default function ShareButtons({
 								size="lg" 
 								className="gap-3 py-4 rounded-xl modern-card group"
 								onClick={() => handleSocialShare('line')}
+								disabled={shareState.isGenerating || !shareState.socialUrls}
 							>
 								<ExternalLink className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
 								라인

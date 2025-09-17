@@ -45,10 +45,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-# Environment files
-.env*
 
 # local tooling and reports
 .cursor/
+.playwright-mcp/
 playwright-report/
 test-results/

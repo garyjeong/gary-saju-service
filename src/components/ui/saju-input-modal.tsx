@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { EnhancedLoading } from "@/components/ui/enhanced-loading";
 import { calculateSaju } from "@/lib/saju/calculator";
 import { validateSajuData } from "@/lib/saju/validation";
-import { X, Calendar, Clock, ArrowLeft, ArrowRight, User, Loader2, Smartphone, AlertCircle, Brain, Check, Star } from "lucide-react";
+import { X, Calendar, Clock, ArrowLeft, ArrowRight, User, Loader2, Smartphone, AlertCircle, Brain, Check, Star, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SajuInputModalProps {

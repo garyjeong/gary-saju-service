@@ -41,6 +41,7 @@ export const MobileSelect = React.forwardRef<
 }, ref) => {
 	const [isOpen, setIsOpen] = React.useState(false);
 	const [isMobile, setIsMobile] = React.useState(false);
+	const listboxId = React.useId();
 	
 	React.useEffect(() => {
 		// 모바일 환경 감지
@@ -164,6 +165,7 @@ export const MobileSelect = React.forwardRef<
 				role="combobox"
 				aria-expanded={isOpen}
 				aria-haspopup="listbox"
+				aria-controls={listboxId}
 				disabled={disabled}
 				className={cn(
 					// 🌟 기본 레이아웃
@@ -236,6 +238,7 @@ export const MobileSelect = React.forwardRef<
 							// 🌟 다크 모드
 							"dark:bg-card dark:border-korea-black-500/30"
 						)}
+						id={listboxId}
 						role="listbox"
 						style={{
 							backgroundImage: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
