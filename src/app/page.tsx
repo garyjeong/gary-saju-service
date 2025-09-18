@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FloatingThemeToggle } from "@/components/ui/theme-toggle";
 import SajuInputModal from "@/components/ui/saju-input-modal";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Heart, User } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,14 +47,27 @@ export default function Home() {
 
 					{/* 메인 액션 버튼 */}
 					<div className="space-y-6">
-						<Button 
-							size="lg" 
-							className="bg-korea-red hover:bg-korea-red/90 text-korea-white px-12 py-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-							onClick={() => setIsModalOpen(true)}
-						>
-							<Sparkles className="w-5 h-5 mr-3" />
-							사주 분석 시작하기
-						</Button>
+						<div className="flex flex-col sm:flex-row gap-4 justify-center">
+							<Button 
+								size="lg" 
+								className="bg-korea-red hover:bg-korea-red/90 text-korea-white px-12 py-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+								onClick={() => setIsModalOpen(true)}
+							>
+								<User className="w-5 h-5 mr-3" />
+								사주 분석 시작하기
+							</Button>
+							
+							<Link href="/compatibility">
+								<Button 
+									size="lg"
+									variant="outline"
+									className="border-2 border-korea-red text-korea-red hover:bg-korea-red hover:text-korea-white px-12 py-6 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+								>
+									<Heart className="w-5 h-5 mr-3" />
+									궁합 분석하기
+								</Button>
+							</Link>
+						</div>
 						
 						<div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
 							<span>✨ 완전 무료</span>

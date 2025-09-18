@@ -48,6 +48,13 @@ export default function Footer() {
 								AI 사주 분석
 							</Link>
 							<Link
+								href="/compatibility"
+								className="group flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-all duration-300 p-3 rounded-xl hover:bg-primary/5"
+							>
+								<div className="w-2 h-2 rounded-full bg-primary group-hover:scale-150 transition-transform duration-300"></div>
+								사주 궁합 분석
+							</Link>
+							<Link
 								href="/share"
 								className="group flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-all duration-300 p-3 rounded-xl hover:bg-primary/5"
 							>

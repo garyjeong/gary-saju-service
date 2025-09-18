@@ -83,6 +83,97 @@ const mysticalGlowVariants = {
 	}
 };
 
+// 🃏 강화된 사주팔자 카드 펼치기 애니메이션
+const sajuCardRevealVariants = {
+	hidden: {
+		opacity: 0,
+		scale: 0.1,
+		rotateY: -180,
+		rotateX: -90,
+		z: -500,
+		filter: "blur(20px) brightness(0.3)",
+		boxShadow: "0 0 0 rgba(255,215,0,0)"
+	},
+	visible: (index: number) => ({
+		opacity: 1,
+		scale: 1,
+		rotateY: 0,
+		rotateX: 0,
+		z: 0,
+		filter: "blur(0px) brightness(1)",
+		boxShadow: [
+			"0 0 0 rgba(255,215,0,0)",
+			"0 20px 60px rgba(255,215,0,0.4)",
+			"0 10px 30px rgba(255,215,0,0.2)"
+		],
+		transition: {
+			delay: 1.2 + index * 0.4,
+			duration: 1.2,
+			ease: [0.23, 1, 0.32, 1],
+			type: "spring",
+			stiffness: 150,
+			damping: 20
+		}
+	})
+};
+
+// ✨ 사주팔자 카드 호버 애니메이션
+const pillarHoverVariants = {
+	rest: {
+		scale: 1,
+		rotateY: 0,
+		rotateX: 0,
+		z: 0,
+		boxShadow: "0 8px 25px rgba(0,0,0,0.1)"
+	},
+	hover: {
+		scale: 1.08,
+		rotateY: 8,
+		rotateX: 5,
+		z: 50,
+		boxShadow: "0 25px 80px rgba(255,215,0,0.4)",
+		transition: {
+			duration: 0.4,
+			ease: "easeOut"
+		}
+	}
+};
+
+// 🌟 사주팔자 컨테이너 애니메이션
+const sajuContainerVariants = {
+	hidden: {
+		opacity: 0
+	},
+	visible: {
+		opacity: 1,
+		transition: {
+			staggerChildren: 0.4,
+			delayChildren: 1.0,
+			duration: 0.6
+		}
+	}
+};
+
+// ⭐ 사주팔자 글로우 효과
+const pillarGlowVariants = {
+	initial: {
+		background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
+	},
+	animate: (index: number) => ({
+		background: [
+			"linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)",
+			"linear-gradient(135deg, rgba(255,215,0,0.2) 0%, rgba(255,215,0,0.1) 100%)",
+			"linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)"
+		],
+		transition: {
+			duration: 3,
+			repeat: Infinity,
+			ease: "easeInOut",
+			delay: index * 0.5
+		}
+	})
+};
+
 export default function ResultPage() {
 	const router = useRouter();
 	const [activeTab, setActiveTab] = useState("basic");
@@ -411,84 +502,151 @@ function BasicInterpretation({ result }: { result: SajuResult }) {
 
 	return (
 		<div className="space-y-6 max-w-4xl mx-auto">
-			{/* 🌟 기본 사주 정보 - 순차 애니메이션 */}
+			{/* 🃏 강화된 사주팔자 카드 펼치기 애니메이션 */}
 			<SajuCard title="사주 팔자" variant="data">
-				<motion.div 
-					className="grid grid-cols-2 md:grid-cols-4 gap-4"
-					variants={staggeredContainerVariants}
-					initial="hidden"
-					animate="visible"
-				>
-					{[
-						{ label: "년주", value: basic.birthInfo.year, delay: 0 },
-						{ label: "월주", value: basic.birthInfo.month, delay: 0.3 },
-						{ label: "일주", value: basic.birthInfo.day, delay: 0.6 },
-						{ label: "시주", value: basic.birthInfo.time, delay: 0.9 }
-					].map((pillar, index) => (
-						<motion.div
-							key={pillar.label}
-							className="text-center space-y-1"
-							variants={cardRevealVariants}
-							custom={index}
-							whileHover={{ 
-								scale: 1.05, 
-								rotateY: 5,
-								transition: { duration: 0.2 }
-							}}
-						>
+				<div className="relative perspective-1000">
+					{/* 배경 효과 */}
+					<div className="absolute inset-0 bg-gradient-to-br from-saju-traditional-gold/5 via-transparent to-saju-cosmic-purple/5 rounded-2xl"></div>
+					
+					<motion.div 
+						className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 relative z-10"
+						variants={sajuContainerVariants}
+						initial="hidden"
+						animate="visible"
+						style={{ transformStyle: "preserve-3d" }}
+					>
+						{[
+							{ label: "년주", value: basic.birthInfo.year, element: "天", color: "from-red-500/20 to-orange-500/20" },
+							{ label: "월주", value: basic.birthInfo.month, element: "地", color: "from-green-500/20 to-emerald-500/20" },
+							{ label: "일주", value: basic.birthInfo.day, element: "人", color: "from-blue-500/20 to-cyan-500/20" },
+							{ label: "시주", value: basic.birthInfo.time, element: "時", color: "from-purple-500/20 to-pink-500/20" }
+						].map((pillar, index) => (
 							<motion.div
-								className="relative p-4 rounded-2xl bg-gradient-to-br from-saju-cosmic-starlight/10 to-saju-cosmic-purple/10 border border-saju-traditional-gold/20"
-								variants={mysticalGlowVariants}
-								initial="initial"
-								animate="animate"
+								key={pillar.label}
+								className="relative group"
+								variants={sajuCardRevealVariants}
+								custom={index}
+								initial="hidden"
+								animate="visible"
+								whileHover="hover"
 								style={{ transformStyle: "preserve-3d" }}
 							>
-								<motion.p 
-									className="text-xs text-muted-foreground mb-2"
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									transition={{ delay: pillar.delay + 0.2 }}
+								<motion.div
+									className={cn(
+										"relative p-6 rounded-3xl",
+										"bg-gradient-to-br from-card to-card/80",
+										"border-2 border-saju-traditional-gold/30",
+										"backdrop-blur-sm shadow-2xl",
+										"hover:border-saju-traditional-gold/60",
+										"transition-all duration-500"
+									)}
+									variants={pillarHoverVariants}
+									animate="rest"
+									whileHover="hover"
+									style={{ transformStyle: "preserve-3d" }}
 								>
-									{pillar.label}
-								</motion.p>
-								<motion.p 
-									className="font-serif font-bold text-lg md:text-xl gradient-text"
-									initial={{ opacity: 0, y: 10 }}
-									animate={{ opacity: 1, y: 0 }}
-									transition={{ delay: pillar.delay + 0.4, type: "spring" }}
-								>
-									{pillar.value}
-								</motion.p>
+									{/* 🌟 배경 글로우 효과 */}
+									<motion.div
+										className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${pillar.color}`}
+										variants={pillarGlowVariants}
+										initial="initial"
+										animate="animate"
+										custom={index}
+									/>
+									
+									{/* 🎭 전통 한자 표시 */}
+									<motion.div
+										className="absolute top-2 right-2 w-8 h-8 rounded-full bg-saju-traditional-gold/20 flex items-center justify-center"
+										initial={{ scale: 0, rotate: -180 }}
+										animate={{ scale: 1, rotate: 0 }}
+										transition={{ 
+											delay: 1.2 + index * 0.4 + 0.3,
+											duration: 0.6,
+											type: "spring"
+										}}
+									>
+										<span className="text-xs font-bold text-saju-traditional-gold">
+											{pillar.element}
+										</span>
+									</motion.div>
+									
+									{/* 📝 라벨 */}
+									<motion.p 
+										className="text-xs text-muted-foreground mb-3 font-medium"
+										initial={{ opacity: 0, x: -10 }}
+										animate={{ opacity: 1, x: 0 }}
+										transition={{ 
+											delay: 1.2 + index * 0.4 + 0.2,
+											duration: 0.4 
+										}}
+									>
+										{pillar.label}
+									</motion.p>
+									
+									{/* 💫 사주 값 */}
+									<motion.div
+										className="text-center"
+										initial={{ opacity: 0, scale: 0.5 }}
+										animate={{ opacity: 1, scale: 1 }}
+										transition={{ 
+											delay: 1.2 + index * 0.4 + 0.4,
+											duration: 0.6,
+											type: "spring",
+											stiffness: 200
+										}}
+									>
+										<p className="font-serif font-bold text-xl md:text-2xl gradient-text leading-tight">
+											{pillar.value}
+										</p>
+									</motion.div>
+									
+									{/* ⭐ 장식 요소들 */}
+									<motion.div
+										className="absolute top-3 left-3 w-2 h-2 bg-saju-traditional-gold rounded-full"
+										animate={{ 
+											scale: [1, 1.5, 1],
+											opacity: [0.4, 1, 0.4]
+										}}
+										transition={{
+											duration: 2.5,
+											repeat: Infinity,
+											delay: 1.2 + index * 0.4 + 1
+										}}
+									/>
+									<motion.div
+										className="absolute bottom-3 right-3 w-1.5 h-1.5 bg-saju-cosmic-starlight rounded-full"
+										animate={{ 
+											scale: [1, 1.3, 1],
+											opacity: [0.3, 0.9, 0.3]
+										}}
+										transition={{
+											duration: 3,
+											repeat: Infinity,
+											delay: 1.2 + index * 0.4 + 1.5
+										}}
+									/>
+									
+									{/* 🌟 호버시 추가 효과 */}
+									<motion.div
+										className="absolute inset-0 rounded-3xl bg-gradient-to-br from-saju-traditional-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+										style={{ mixBlendMode: "overlay" }}
+									/>
+								</motion.div>
 								
-								{/* 🌟 신비로운 장식 요소 */}
+								{/* 🎭 카드 그림자 효과 */}
 								<motion.div
-									className="absolute top-1 right-1 w-2 h-2 bg-saju-traditional-gold rounded-full"
-									animate={{ 
-										scale: [1, 1.2, 1],
-										opacity: [0.5, 1, 0.5]
-									}}
-									transition={{
-										duration: 2,
-										repeat: Infinity,
-										delay: pillar.delay
-									}}
-								/>
-								<motion.div
-									className="absolute bottom-1 left-1 w-1.5 h-1.5 bg-saju-cosmic-starlight rounded-full"
-									animate={{ 
-										scale: [1, 1.3, 1],
-										opacity: [0.3, 0.8, 0.3]
-									}}
-									transition={{
-										duration: 2.5,
-										repeat: Infinity,
-										delay: pillar.delay + 0.5
+									className="absolute inset-0 bg-gradient-to-br from-saju-traditional-gold/20 to-transparent rounded-3xl blur-xl -z-10"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 0.6 }}
+									transition={{ 
+										delay: 1.2 + index * 0.4 + 0.8,
+										duration: 0.8 
 									}}
 								/>
 							</motion.div>
-						</motion.div>
-					))}
-				</motion.div>
+						))}
+					</motion.div>
+				</div>
 			</SajuCard>
 
 			{/* 한 줄 요약 */}
