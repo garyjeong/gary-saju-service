@@ -11,6 +11,7 @@
 ## ✨ 주요 기능
 
 ### 🎯 **핵심 서비스**
+
 - **🔮 AI 사주 해석**: OpenAI/Google AI 기반 개인화된 사주팔자 분석
 - **💕 상성 분석 시스템**: 두 사람의 사주를 비교하여 궁합 점수 및 상세 해석 제공
 - **🎨 전통 한국 UI**: 오행(五行) 색상 시스템과 서예체 디자인
@@ -20,6 +21,7 @@
 - **💾 이미지 캡처**: 고품질 PNG 이미지로 사주 카드 저장
 
 ### 🚀 **기술적 특징**
+
 - **⚡ 고성능**: Next.js 15 + Turbopack으로 빠른 개발 경험
 - **🔒 타입 안전성**: TypeScript strict 모드로 안정성 보장
 - **🧪 완전한 테스트**: Jest + Playwright로 50개 테스트 구축
@@ -31,16 +33,13 @@
 ## 🚀 빠른 시작
 
 ### 사전 요구사항
-- Node.js 18+ 
+
+- Node.js 18+
 - pnpm 9.0.0+
 
 ### 로컬 개발 환경 설정
 
 ```bash
-# 저장소 클론
-git clone https://github.com/your-username/gary-saju-service.git
-cd gary-saju-service
-
 # 의존성 설치 (pnpm 권장)
 pnpm install
 
@@ -57,6 +56,7 @@ pnpm dev
 ## 🛠️ 기술 스택
 
 ### **Frontend**
+
 - [Next.js 15](https://nextjs.org) - React 메타프레임워크
 - [React 19](https://react.dev) - UI 라이브러리
 - [TypeScript](https://www.typescriptlang.org) - 타입 안전성
@@ -64,6 +64,7 @@ pnpm dev
 - [Shadcn UI](https://ui.shadcn.com) - 컴포넌트 라이브러리
 
 ### **AI & API**
+
 - [OpenAI API](https://openai.com) - 주 AI 해석 엔진
 - [Google AI Studio](https://ai.google.dev) - 대안 AI 서비스
 - **통합 AI 클라이언트**: 다중 공급자 지원 및 자동 폴백
@@ -72,23 +73,26 @@ pnpm dev
 - [Zod](https://zod.dev) - 스키마 검증
 
 ### **공유 & 미디어**
+
 - [html-to-image](https://github.com/bubkoo/html-to-image) - 클라이언트 사이드 이미지 캡처
 - [Vercel Analytics](https://vercel.com/analytics) - 사용자 행동 분석
 - Web Share API - 네이티브 공유 기능
 
 ### **개발 도구**
+
 - [pnpm](https://pnpm.io) - 패키지 매니저
 - [ESLint](https://eslint.org) + [Prettier](https://prettier.io) - 코드 품질
 - [Jest](https://jestjs.io) + [Playwright](https://playwright.dev) - 테스트
 
 ### **디자인 시스템**
+
 - **전통 한국 테마**: 오행(五行) 기반 색상 체계
 - **서예체 타이포그래피**: Noto Serif KR 기반
 - **애니메이션**: 6가지 전통 테마 효과 (yin-yang, cosmic-float, star-twinkle 등)
 
 ## 📁 프로젝트 구조
 
-```
+```text
 ├── src/
 │   ├── app/                 # Next.js App Router
 │   │   ├── input/          # 사주 정보 입력 페이지
@@ -133,20 +137,67 @@ pnpm test:e2e
 pnpm test:coverage
 ```
 
-## 📦 배포
+## 🐳 Docker 배포
 
-### Vercel 배포 (권장)
+### Docker 이미지 빌드
+
 ```bash
-# Vercel CLI 설치
-pnpm add -g vercel
+# 이미지 빌드
+docker build -t gary-saju-service .
 
-# 배포
-vercel --prod
+# 개발용 빌드 (태그 지정)
+docker build -t gary-saju-service:dev .
+
+# 프로덕션용 빌드 (태그 지정)
+docker build -t gary-saju-service:latest .
+```
+
+### Docker 컨테이너 실행
+
+```bash
+# 기본 실행
+docker run -p 3000:3000 gary-saju-service
+
+# 환경 변수와 함께 실행
+docker run -p 3000:3000 \
+  -e OPENAI_API_KEY=your_openai_api_key \
+  -e GOOGLE_AI_API_KEY=your_google_ai_api_key \
+  -e NEXT_PUBLIC_SITE_URL=http://localhost:3000 \
+  gary-saju-service
+
+# 백그라운드 실행
+docker run -d -p 3000:3000 \
+  --name gary-saju \
+  -e OPENAI_API_KEY=your_openai_api_key \
+  -e GOOGLE_AI_API_KEY=your_google_ai_api_key \
+  gary-saju-service
+
+# 컨테이너 로그 확인
+docker logs gary-saju
+
+# 컨테이너 중지 및 제거
+docker stop gary-saju
+docker rm gary-saju
+```
+
+### Docker 개발 환경
+
+```bash
+# 볼륨 마운트로 개발 환경 실행
+docker run -p 3000:3000 \
+  -v $(pwd):/app \
+  -v /app/node_modules \
+  --name gary-saju-dev \
+  gary-saju-service:dev
+
+# 헬스체크 확인
+docker exec gary-saju node healthcheck.js
 ```
 
 ## 🔧 개발 가이드
 
 ### 환경 변수 설정
+
 ```bash
 # .env.local
 
@@ -172,19 +223,22 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 ### 개발용 도구
+
 - **공유 기능 테스트**: [http://localhost:3000/test-share](http://localhost:3000/test-share)
   - 로컬스토리지 기반 공유 데이터 관리
   - 테스트 공유 링크 생성 및 통계 확인
   - 공유 데이터 정리 도구
 
 ### 코드 스타일
+
 - ESLint 규칙 준수 (0개 오류 유지)
 - Prettier 자동 포매팅
 - TypeScript strict 모드 사용
 - 컴포넌트는 PascalCase, 파일명은 kebab-case
 
 ### 커밋 메시지 컨벤션
-```
+
+```text
 feat: 새로운 기능 추가
 fix: 버그 수정
 docs: 문서 변경
@@ -203,23 +257,9 @@ chore: 빌드 업무 수정, 패키지 매니저 설정 등
 | **테스트 커버리지** | 80%+ | ✅ 85% |
 | **빌드 성공률** | 100% | ✅ 100% |
 
-## 🤝 기여 가이드
-
-1. 이 저장소를 포크합니다
-2. 기능 브랜치를 생성합니다 (`git checkout -b feature/amazing-feature`)
-3. 변경사항을 커밋합니다 (`git commit -m 'feat: add amazing feature'`)
-4. 브랜치에 푸시합니다 (`git push origin feature/amazing-feature`)
-5. Pull Request를 생성합니다
-
 ## 📄 라이선스
 
 이 프로젝트는 MIT 라이선스 하에 있습니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
-
-## 📞 지원 및 문의
-
-- **버그 리포트**: [GitHub Issues](https://github.com/your-username/gary-saju-service/issues)
-- **기능 요청**: [GitHub Discussions](https://github.com/your-username/gary-saju-service/discussions)
-- **이메일**: your-email@example.com
 
 ---
 
